@@ -7,13 +7,24 @@
 
 import SwiftUI
 
-struct Diamond: Shape {
+struct Diamond: InsettableShape {
+    
+    var insetAmount: CGFloat = 0
+    
+    func inset(by amount: CGFloat) -> Diamond {
+        var shape = self
+        shape.insetAmount = amount
+        return shape
+    }
     
     func path(in rect: CGRect) -> Path {
-        let bottom = CGPoint(x: rect.minX, y: rect.midY)
-        let left = CGPoint(x: rect.midX, y: rect.minY)
-        let top = CGPoint(x: rect.maxX, y: rect.midY)
-        let right = CGPoint(x: rect.midX, y: rect.maxY)
+        
+        let insetRect = rect.insetBy(dx: insetAmount, dy: insetAmount)
+        
+        let bottom = CGPoint(x: insetRect.minX, y: insetRect.midY)
+        let left = CGPoint(x: insetRect.midX, y: insetRect.minY)
+        let top = CGPoint(x: insetRect.maxX, y: insetRect.midY)
+        let right = CGPoint(x: insetRect.midX, y: insetRect.maxY)
         
         var p = Path()
         
@@ -22,6 +33,7 @@ struct Diamond: Shape {
         p.addLine(to: top)
         p.addLine(to: right)
         p.addLine(to: bottom)
+        p.closeSubpath()
         
         return p
     }
@@ -31,6 +43,8 @@ struct Diamond: Shape {
 struct Diamond_Previews: PreviewProvider {
     static var previews: some View {
         Diamond()
-            .aspectRatio(9 / 4, contentMode: .fit)
+            .strokeBorder(lineWidth: 10)
+            .aspectRatio(2, contentMode: .fit)
+            .padding()
     }
 }

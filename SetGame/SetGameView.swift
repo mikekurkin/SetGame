@@ -17,7 +17,7 @@ struct ContentView: View {
                     Spacer()
                     ForEach(0..<sg.rank(for: card)) { _ in
                         sg.form(for: card)
-                            .sgFill(for: card)
+                            .sgFill(sg.fill(for: card))
                             .aspectRatio(2, contentMode: .fit)
                             .padding(.vertical, 5)
                     }
@@ -31,6 +31,25 @@ struct ContentView: View {
             }
             .foregroundColor(.purple)
             .padding()
+        }
+    }
+}
+
+extension InsettableShape {
+    @ViewBuilder
+    func sgFill(_ fill: String) -> some View {
+        ZStack{
+            switch fill {
+            case "stroked":
+                self.fill().opacity(0)
+            case "shaded":
+                self.fill().opacity(0.2)
+            case "filled":
+                self.fill()
+            default:
+                self
+            }
+            self.strokeBorder(lineWidth: 2)
         }
     }
 }

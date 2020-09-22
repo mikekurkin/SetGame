@@ -41,6 +41,7 @@ struct BezierCurve {
                 p.addCurve(to: points[index].point, control1: points[index - 1].control1, control2: points[index].control2)
             }
             p.addCurve(to: points.first!.point, control1: points.last!.control1, control2: points.first!.control2)
+            p.closeSubpath()
         }
         return p
     }

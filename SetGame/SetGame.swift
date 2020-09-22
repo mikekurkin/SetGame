@@ -33,11 +33,11 @@ class SetGame: ObservableObject {
     }
     
     
-    func form(for card: SetLikeGame.Card) -> AnyShape {
-        if let shape = card.properties["form"]?.value as? AnyShape {
+    func form(for card: SetLikeGame.Card) -> AnyInsettableShape {
+        if let shape = card.properties["form"]?.value as? AnyInsettableShape {
             return shape
         } else {
-            return AnyShape(Circle())
+            return AnyInsettableShape(Circle())
         }
     }
     
@@ -48,34 +48,16 @@ class SetGame: ObservableObject {
         return hue
     }
     
-//    func fill(for card: SetLikeGame.Card) -> 
-
-}
-
-extension Shape {
-    @ViewBuilder
-    func sgFill(for card: SetLikeGame.Card) -> some View {
-        if let fill = card.properties["fill"]?.description {
-            ZStack{
-                switch fill {
-                case "stroked":
-                    self.fill().opacity(0)
-                case "shaded":
-                    self.fill().opacity(0.2)
-                case "filled":
-                    self.fill()
-                default:
-                    self
-                }
-                self.stroke(lineWidth: 2)
-            }
-            
-        } else {
-            self
+    func fill(for card: SetLikeGame.Card) -> String {
+        guard let fill = card.properties["fill"]?.description else {
+            return ""
         }
-        
+        return fill
     }
+
 }
+
+
 
 enum Rank: String, CaseIterable, PropertyValue {
     case one
@@ -104,9 +86,9 @@ enum Form: String, CaseIterable, PropertyValue {
     
     var value: Any {
         switch self {
-            case .oval: return AnyShape(Capsule())
-            case .diamond: return AnyShape(Diamond())
-            case .squiglee: return AnyShape(Squiglee())
+            case .oval: return AnyInsettableShape(Capsule())
+            case .diamond: return AnyInsettableShape(Diamond())
+            case .squiglee: return AnyInsettableShape(Squiglee())
         }
     }
 }

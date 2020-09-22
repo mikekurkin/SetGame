@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4D0BC21825198AC70025FAFA /* AnyShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BC21725198AC70025FAFA /* AnyShape.swift */; };
 		4D76867E25148DE400473B8C /* SetGameApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D76867D25148DE400473B8C /* SetGameApp.swift */; };
 		4D76868025148DE400473B8C /* SetGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D76867F25148DE400473B8C /* SetGameView.swift */; };
 		4D76868225148DE800473B8C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D76868125148DE800473B8C /* Assets.xcassets */; };
@@ -23,6 +24,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		4D0BC21725198AC70025FAFA /* AnyShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyShape.swift; sourceTree = "<group>"; };
 		4D76867A25148DE400473B8C /* SetGame.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SetGame.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D76867D25148DE400473B8C /* SetGameApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetGameApp.swift; sourceTree = "<group>"; };
 		4D76867F25148DE400473B8C /* SetGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetGameView.swift; sourceTree = "<group>"; };
@@ -78,6 +80,7 @@
 				4D7686A52514E68700473B8C /* Cardify.swift */,
 				4D76868E25148EE600473B8C /* SetLikeGame.swift */,
 				4D76869225148EF900473B8C /* SetGame.swift */,
+				4D0BC21725198AC70025FAFA /* AnyShape.swift */,
 				4D7686982514C0A600473B8C /* GridLayout.swift */,
 				4D7686952514C09600473B8C /* Grid.swift */,
 				4D76869E2514C4C000473B8C /* Array+Identifiable.swift */,
@@ -166,6 +169,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D76868025148DE400473B8C /* SetGameView.swift in Sources */,
+				4D0BC21825198AC70025FAFA /* AnyShape.swift in Sources */,
 				4D76868F25148EE600473B8C /* SetLikeGame.swift in Sources */,
 				4D7686A62514E68700473B8C /* Cardify.swift in Sources */,
 				4D76867E25148DE400473B8C /* SetGameApp.swift in Sources */,
