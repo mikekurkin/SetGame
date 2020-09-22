@@ -7,19 +7,74 @@
 
 import SwiftUI
 
-struct AnyShape: Shape {
-    init<S: Shape>(_ wrapped: S) {
-        _path = { rect in
-            let path = wrapped.path(in: rect)
-            return path
+class SetGame: ObservableObject {
+    @Published private var game = createSetGame()
+    
+    private static func createSetGame() -> SetLikeGame {
+        
+        let ranks = SetLikeGame.CardProperty(Rank.allCases)
+        let forms = SetLikeGame.CardProperty(Form.allCases)
+        let hues = SetLikeGame.CardProperty(Hue.allCases)
+        let fills = SetLikeGame.CardProperty(Fill.allCases)
+        
+        return SetLikeGame(properties: [forms, hues, fills, ranks])
+    }
+    
+    
+    var deck: [SetLikeGame.Card] {
+        game.deck
+    }
+    
+    func rank(for card: SetLikeGame.Card) -> Int {
+        guard let rank = card.properties["rank"]?.value as? Int else {
+            return 0
+        }
+        return rank
+    }
+    
+    
+    func form(for card: SetLikeGame.Card) -> AnyShape {
+        if let shape = card.properties["form"]?.value as? AnyShape {
+            return shape
+        } else {
+            return AnyShape(Circle())
         }
     }
-
-    func path(in rect: CGRect) -> Path {
-        return _path(rect)
+    
+    func hue(for card: SetLikeGame.Card) -> Color {
+        guard let hue = card.properties["hue"]?.value as? Color else {
+            return Color.black
+        }
+        return hue
     }
+    
+//    func fill(for card: SetLikeGame.Card) -> 
 
-    private let _path: (CGRect) -> Path
+}
+
+extension Shape {
+    @ViewBuilder
+    func sgFill(for card: SetLikeGame.Card) -> some View {
+        if let fill = card.properties["fill"]?.description {
+            ZStack{
+                switch fill {
+                case "stroked":
+                    self.fill().opacity(0)
+                case "shaded":
+                    self.fill().opacity(0.2)
+                case "filled":
+                    self.fill()
+                default:
+                    self
+                }
+                self.stroke(lineWidth: 2)
+            }
+            
+        } else {
+            self
+        }
+        
+    }
 }
 
 enum Rank: String, CaseIterable, PropertyValue {
@@ -83,74 +138,5 @@ enum Fill: String, CaseIterable, PropertyValue {
     var description: String { self.rawValue }
     
     var value: Any {EmptyModifier()}
-}
-
-class SetGame: ObservableObject {
-    @Published private var game = createSetGame()
-    
-    private static func createSetGame() -> SetLikeGame {
-        
-        let ranks = CardProperty(Rank.allCases)
-        let forms = CardProperty(Form.allCases)
-        let hues = CardProperty(Hue.allCases)
-        let fills = CardProperty(Fill.allCases)
-        
-        let properties = [forms, hues, fills, ranks]
-        return SetLikeGame(properties: properties)
-    }
-    
-    var deck: [SetLikeGame.Card] {
-        game.deck
-    }
-    
-    func rank(for card: SetLikeGame.Card) -> Int {
-        guard let rank = card.properties["rank"]?.value as? Int else {
-            return 0
-        }
-        return rank
-    }
-    
-//    @ViewBuilder
-    func form(for card: SetLikeGame.Card) -> AnyShape {
-        if let shape = card.properties["form"]?.value as? AnyShape {
-            return shape
-        } else {
-            return AnyShape(Circle())
-        }
-    }
-    
-    func hue(for card: SetLikeGame.Card) -> Color {
-        guard let hue = card.properties["hue"]?.value as? Color else {
-            return Color.black
-        }
-        return hue
-    }
-
-    
-}
-
-extension Shape {
-    @ViewBuilder
-    func sgFill(for card: SetLikeGame.Card) -> some View {
-        if let fill = card.properties["fill"]?.description {
-            ZStack{
-                switch fill {
-                case "stroked":
-                    self.fill().opacity(0)
-                case "shaded":
-                    self.fill().opacity(0.2)
-                case "filled":
-                    self.fill()
-                default:
-                    self
-                }
-                self.stroke(lineWidth: 2)
-            }
-            
-        } else {
-            self
-        }
-        
-    }
 }
 
