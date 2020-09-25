@@ -38,18 +38,21 @@ struct ContentView: View {
 extension InsettableShape {
     @ViewBuilder
     func sgFill(_ fill: String) -> some View {
-        ZStack{
-            switch fill {
-            case "stroked":
-                self.fill().opacity(0)
-            case "shaded":
-                self.fill().opacity(0.2)
-            case "filled":
-                self.fill()
-            default:
-                self
+        GeometryReader { geometry in
+            ZStack{
+                switch fill {
+                case "stroked":
+                    self.fill().opacity(0)
+                case "shaded":
+                    Hatch(20, at: Angle(degrees: 90), lineWidth: 0.7)
+                        .clipShape(self)
+                case "filled":
+                    self.fill()
+                default:
+                    self
+                }
+                self.strokeBorder(lineWidth: 2)
             }
-            self.strokeBorder(lineWidth: 2)
         }
     }
 }

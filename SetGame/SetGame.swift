@@ -37,7 +37,7 @@ class SetGame: ObservableObject {
         if let shape = card.properties["form"]?.value as? AnyInsettableShape {
             return shape
         } else {
-            return AnyInsettableShape(Circle())
+            return AnyInsettableShape(Rectangle())
         }
     }
     

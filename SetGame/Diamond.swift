@@ -40,11 +40,16 @@ struct Diamond: InsettableShape {
     
 }
 
+
 struct Diamond_Previews: PreviewProvider {
     static var previews: some View {
-        Diamond()
-            .strokeBorder(lineWidth: 10)
-            .aspectRatio(2, contentMode: .fit)
-            .padding()
+        GeometryReader { geometry in
+            ZStack {
+                Diamond()
+                    .strokeBorder(lineWidth: 10)
+            }
+        }
+        .aspectRatio(2, contentMode: .fit)
+        .padding()
     }
 }
