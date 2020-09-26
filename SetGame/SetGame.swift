@@ -19,10 +19,11 @@ class SetGame: ObservableObject {
         let hues = SetLikeGame.CardProperty(Hue.allCases)
         let fills = SetLikeGame.CardProperty(Fill.allCases)
         
-        guard let game = SetLikeGame(properties: [forms, hues, fills, ranks]) else {
+        guard var game = SetLikeGame(properties: [forms, hues, fills, ranks]) else {
             fatalError()
         }
         
+        game.deal(12)
         return game
     }
     
@@ -32,12 +33,18 @@ class SetGame: ObservableObject {
     }
     
     var cards: [SetLikeGame.Card] {
-        return Array(game.deck.prefix(upTo: 12))
+        deck.filter{
+            game.onScreenCards.contains($0.id)
+        }
 //        return Array(game.deck.shuffled().prefix(upTo: 12))
     }
     
     func select(_ card: SetLikeGame.Card) {
         game.select(card)
+    }
+    
+    func deal(_ count: Int) {
+        game.deal(count)
     }
     
     func rank(for card: SetLikeGame.Card) -> Int {

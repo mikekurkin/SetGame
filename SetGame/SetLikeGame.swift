@@ -8,9 +8,14 @@
 import Foundation
 
 struct SetLikeGame {
-    private(set) var deck: [Card]
+    
     private var properties: [CardProperty]
     private var propertyValuesCount: Int
+    
+    private(set) var deck: [Card]
+    
+    /// Contains `id`s of cards in the deck
+    private(set) var onScreenCards: [Int] = []
     
     
     /// Arary that contains only selected cards
@@ -72,6 +77,12 @@ struct SetLikeGame {
         }
         
         return deck
+    }
+
+    /// "Deals"
+    mutating func deal(_ count: Int) {
+        onScreenCards = []
+        onScreenCards = Array(deck.shuffled().prefix(upTo: count)).map{ $0.id }
     }
     
     init?(properties: [CardProperty]) {
