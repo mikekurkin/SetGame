@@ -12,6 +12,25 @@ struct ContentView: View {
     
     var body: some View {
         VStack {
+            HStack(alignment: .center) {
+                Text("Set Game").bold()
+                Spacer()
+                HStack(spacing: 25) {
+                    Button {
+                        withAnimation(.easeInOut) {
+                            sg.add(3)
+                        }
+                    } label: { Image(systemName: "plus") }
+                    Button {
+                        withAnimation(.easeInOut) {
+                            sg.deal(12)
+                        }
+                    } label: { Image(systemName: "shuffle") }
+                }
+            }
+            .font(.title)
+            .padding()
+            
             Grid(sg.cards, itemDesiredAspectRatio: 5 / 7) { card in
 //                ZStack {
                     VStack(spacing: 0) {
@@ -53,7 +72,7 @@ extension InsettableShape {
                     Hatch(20, at: Angle(degrees: 90), lineWidth: 0.7)
                         .clipShape(self)
                 case "filled":
-                    self.fill()
+                    self.fill().opacity(0.5)
                 default:
                     self
                 }

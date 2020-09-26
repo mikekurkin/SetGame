@@ -82,7 +82,11 @@ struct SetLikeGame {
     /// "Deals"
     mutating func deal(_ count: Int) {
         onScreenCards = []
-        onScreenCards = Array(deck.shuffled().prefix(upTo: count)).map{ $0.id }
+        onScreenCards = deck.shuffled().prefix(upTo: count).map{ $0.id }
+    }
+    
+    mutating func add(_ count: Int) {
+        onScreenCards.append(contentsOf: deck.shuffled().filter{ !onScreenCards.contains($0.id)  }.prefix(count).map{ $0.id })
     }
     
     init?(properties: [CardProperty]) {

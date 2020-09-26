@@ -47,6 +47,10 @@ class SetGame: ObservableObject {
         game.deal(count)
     }
     
+    func add(_ count: Int) {
+        game.add(count)
+    }
+    
     func rank(for card: SetLikeGame.Card) -> Int {
         guard let rank = card.properties["rank"]?.value as? Int else {
             return 0
