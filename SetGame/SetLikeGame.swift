@@ -9,49 +9,88 @@ import Foundation
 
 struct SetLikeGame {
     private(set) var deck: [Card]
+    private var properties: [CardProperty]
+    private var propertyValuesCount: Int
     
-    private static func generateDeck(with properties: [CardProperty]) -> [Card] {
-        var deck: [Card] = []
-        
-        func addProperties(_ properties: [CardProperty], card: Card = Card(id: 0, properties: [:])) {
-            if properties.isEmpty {
-                return
+    
+    /// Arary that contains only selected cards
+    var selectedCards: [Card] {
+        deck.filter{ $0.isSelected }
+    }
+    
+    /// Toggles `card`'s `isSelected`, if enough cards for a set is selected, checks
+    /// if selected cards actually form a set and sets all cards to not selected.
+    mutating func select(_ card: Card) {
+        deck[deck.firstIndex(matching: card)!].isSelected.toggle()
+        if selectedCards.count == propertyValuesCount {
+            print(doFormSet(selectedCards))
+            for index in 0..<deck.count {
+                deck[index].isSelected = false
             }
+        }
+    }
+    
+    /// Returns true if for `cards` it is true that either all the properties
+    /// are the same or they are all different.
+    private func doFormSet(_ cards: [Card]) -> Bool {
+        print(cards.map{$0.description})
+        
+        var cardProperties: [[String]] = []
+        for (propertyIndex, property) in properties.enumerated() {
+            cardProperties.append([])
+            for card in cards {
+                cardProperties[propertyIndex].append(card.properties[property.propertyName]?.rawValue ?? "")
+            }
+            print(property.propertyName, cardProperties[propertyIndex])
+        }
+        let sameOrDifferent = cardProperties.map{ $0.allEqual() || $0.allDifferent() }
+        print(sameOrDifferent)
+        
+        let isSet = sameOrDifferent.reduce(true) { $0 && $1 }
+        return isSet
+    }
+    
+    
+    
+    /// Returns a deck containing all cards with unique combinations of properties.
+    private static func generateDeck(with properties: [CardProperty], deck: [Card] = [], card: Card = Card(id: 0, properties: [:])) -> [Card] {
             
-            var properties = properties
-            var card = card
-            
+        var properties = properties
+        var deck = deck
+        var card = card
+        
+        if !properties.isEmpty {
             for value in properties.removeLast().values {
                 card.properties.updateValue(value, forKey: value.propertyName)
                 if properties.isEmpty {
                     card.id = deck.count
                     deck.append(card)
                 } else {
-                    addProperties(properties, card: card)
+                    deck = generateDeck(with: properties, deck: deck, card: card)
                 }
             }
         }
         
-        addProperties(properties)
-        
         return deck
     }
     
-    init(properties: [CardProperty]) {
+    init?(properties: [CardProperty]) {
+        let propertyValuesCounts = properties.map { $0.values.count }
+        if !propertyValuesCounts.allEqual() {
+            return nil
+        }
+        self.propertyValuesCount = propertyValuesCounts.first ?? 0
+        self.properties = properties
         self.deck = SetLikeGame.generateDeck(with: properties)
     }
     
-    struct CardProperty {
-        let values: [PropertyValue]
-        
-        init(_ values: [PropertyValue]) {
-            self.values = values
-        }
-    }
     
     struct Card: Identifiable {
         var id: Int
         var properties: [String:PropertyValue]
+        
+        var isFaceUp: Bool = true
+        var isSelected: Bool = false
         
         var description: String {
             var res = "\(id):"
@@ -62,10 +101,20 @@ struct SetLikeGame {
         }
     }
     
+    struct CardProperty {
+        let values: [PropertyValue]
+        var propertyName: String
+        
+        init(_ values: [PropertyValue]) {
+            self.values = values
+            self.propertyName = values.first?.propertyName ?? ""
+        }
+    }
 }
 
 protocol PropertyValue {
     var description: String { get }
+    var rawValue: String { get }
     var propertyName: String { get }
-    var value: Any { get }
+    var value: Any? { get }
 }

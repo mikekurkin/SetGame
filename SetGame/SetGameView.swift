@@ -12,22 +12,28 @@ struct ContentView: View {
     
     var body: some View {
         VStack {
-            Grid(Array(sg.deck.shuffled().prefix(upTo: 12)), itemDesiredAspectRatio: 5 / 7) { card in
-                VStack(spacing: 0) {
-                    Spacer()
-                    ForEach(0..<sg.rank(for: card)) { _ in
-                        sg.form(for: card)
-                            .sgFill(sg.fill(for: card))
-                            .aspectRatio(2, contentMode: .fit)
-                            .padding(.vertical, 5)
+            Grid(sg.cards, itemDesiredAspectRatio: 5 / 7) { card in
+//                ZStack {
+                    VStack(spacing: 0) {
+                        Spacer()
+                        ForEach(0..<sg.rank(for: card)) { _ in
+                            sg.form(for: card)
+                                .sgFill(sg.fill(for: card))
+                                .aspectRatio(2, contentMode: .fit)
+                                .padding(.vertical, 5)
+                        }
+                        .foregroundColor(sg.hue(for: card))
+                        .padding(.horizontal, 20)
+                        Spacer()
                     }
-                    .foregroundColor(sg.hue(for: card))
-                    .padding(.horizontal, 20)
-                    Spacer()
-                }
-                .cardify(isFaceUp: true, cardBack: Rectangle().fill())
-                .aspectRatio(5/7, contentMode: .fit)
-                .padding(5)
+                    .cardify(isFaceUp: true, cardBack: Rectangle().fill())
+                    .aspectRatio(5/7, contentMode: .fit)
+                    .scaleEffect(card.isSelected ? 1.04 : 1)
+                    .shadow(color: Color.purple.opacity(card.isSelected ? 0.5 : 0), radius: 10)
+                    .onTapGesture { sg.select(card) }
+                    .padding(5)
+                    
+//                }
             }
             .foregroundColor(.purple)
             .padding()
@@ -58,9 +64,11 @@ extension InsettableShape {
 }
 
 struct ContentView_Previews: PreviewProvider {
+    
     static var previews: some View {
         let game = SetGame()
-        ContentView(sg: game)
-            .preferredColorScheme(.dark)
+        game.select(game.cards[1])
+        return ContentView(sg: game)
+//            .preferredColorScheme(.dark)
     }
 }

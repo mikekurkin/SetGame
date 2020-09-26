@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		4D0BC21825198AC70025FAFA /* AnyShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BC21725198AC70025FAFA /* AnyShape.swift */; };
+		4D30F40C251F4608005BA249 /* Array+Equatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30F40B251F4608005BA249 /* Array+Equatable.swift */; };
 		4D76867E25148DE400473B8C /* SetGameApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D76867D25148DE400473B8C /* SetGameApp.swift */; };
 		4D76868025148DE400473B8C /* SetGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D76867F25148DE400473B8C /* SetGameView.swift */; };
 		4D76868225148DE800473B8C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D76868125148DE800473B8C /* Assets.xcassets */; };
@@ -27,6 +28,7 @@
 
 /* Begin PBXFileReference section */
 		4D0BC21725198AC70025FAFA /* AnyShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyShape.swift; sourceTree = "<group>"; };
+		4D30F40B251F4608005BA249 /* Array+Equatable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array+Equatable.swift"; sourceTree = "<group>"; };
 		4D76867A25148DE400473B8C /* SetGame.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SetGame.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D76867D25148DE400473B8C /* SetGameApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetGameApp.swift; sourceTree = "<group>"; };
 		4D76867F25148DE400473B8C /* SetGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetGameView.swift; sourceTree = "<group>"; };
@@ -89,6 +91,7 @@
 				4D7686982514C0A600473B8C /* GridLayout.swift */,
 				4D7686952514C09600473B8C /* Grid.swift */,
 				4D76869E2514C4C000473B8C /* Array+Identifiable.swift */,
+				4D30F40B251F4608005BA249 /* Array+Equatable.swift */,
 				4D76868125148DE800473B8C /* Assets.xcassets */,
 				4D76868625148DE800473B8C /* Info.plist */,
 				4D76868325148DE800473B8C /* Preview Content */,
@@ -184,6 +187,7 @@
 				4D7686AC25168AED00473B8C /* Squiglee.swift in Sources */,
 				4D7686992514C0A600473B8C /* GridLayout.swift in Sources */,
 				4D7686962514C09600473B8C /* Grid.swift in Sources */,
+				4D30F40C251F4608005BA249 /* Array+Equatable.swift in Sources */,
 				4D7686A92515075900473B8C /* Diamond.swift in Sources */,
 				4D7686AF25169E5200473B8C /* BezierCurve.swift in Sources */,
 				4D76869F2514C4C000473B8C /* Array+Identifiable.swift in Sources */,

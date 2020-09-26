@@ -8,7 +8,9 @@
 import SwiftUI
 
 class SetGame: ObservableObject {
+    
     @Published private var game = createSetGame()
+    
     
     private static func createSetGame() -> SetLikeGame {
         
@@ -17,12 +19,25 @@ class SetGame: ObservableObject {
         let hues = SetLikeGame.CardProperty(Hue.allCases)
         let fills = SetLikeGame.CardProperty(Fill.allCases)
         
-        return SetLikeGame(properties: [forms, hues, fills, ranks])
+        guard let game = SetLikeGame(properties: [forms, hues, fills, ranks]) else {
+            fatalError()
+        }
+        
+        return game
     }
     
     
     var deck: [SetLikeGame.Card] {
         game.deck
+    }
+    
+    var cards: [SetLikeGame.Card] {
+        return Array(game.deck.prefix(upTo: 12))
+//        return Array(game.deck.shuffled().prefix(upTo: 12))
+    }
+    
+    func select(_ card: SetLikeGame.Card) {
+        game.select(card)
     }
     
     func rank(for card: SetLikeGame.Card) -> Int {
@@ -54,7 +69,6 @@ class SetGame: ObservableObject {
         }
         return fill
     }
-
 }
 
 
@@ -67,7 +81,7 @@ enum Rank: String, CaseIterable, PropertyValue {
     var propertyName: String { "rank" }
     var description: String { self.rawValue }
     
-    var value: Any {
+    var value: Any? {
         switch self {
             case .one: return 1
             case .two: return 2
@@ -84,7 +98,7 @@ enum Form: String, CaseIterable, PropertyValue {
     var propertyName: String { "form" }
     var description: String { self.rawValue }
     
-    var value: Any {
+    var value: Any? {
         switch self {
             case .oval: return AnyInsettableShape(Capsule())
             case .diamond: return AnyInsettableShape(Diamond())
@@ -102,7 +116,7 @@ enum Hue: String, CaseIterable, PropertyValue {
     var propertyName: String { "hue" }
     var description: String { self.rawValue }
     
-    var value: Any {
+    var value: Any? {
         switch self {
         case .red: return Color(red: 255 / 255, green: 0 / 255, blue: 134 / 255)
         case .green: return Color(red: 68 / 255, green: 212 / 255, blue: 77 / 255)
@@ -119,6 +133,6 @@ enum Fill: String, CaseIterable, PropertyValue {
     var propertyName: String { "fill" }
     var description: String { self.rawValue }
     
-    var value: Any {EmptyModifier()}
+    var value: Any? { nil }
 }
 
