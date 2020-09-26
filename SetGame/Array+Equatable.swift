@@ -7,14 +7,13 @@
 
 import Foundation
 
-extension Array where Element: Equatable {
+extension ArraySlice where Element: Equatable {
     func allEqual() -> Bool {
         if self.isEmpty {
             return true
         }
-        let firstElement = self.first
         for element in self.dropFirst() {
-            if element != firstElement {
+            if element != self.first {
                 return false
             }
         }
@@ -25,9 +24,8 @@ extension Array where Element: Equatable {
         if self.isEmpty {
             return false
         }
-        let firstElement = self.first
         for element in self.dropFirst() {
-            if element == firstElement {
+            if element == self.first {
                 return false
             }
         }
@@ -38,33 +36,12 @@ extension Array where Element: Equatable {
     }
 }
 
-extension ArraySlice where Element: Equatable {
+extension Array where Element: Equatable {
     func allEqual() -> Bool {
-        if self.isEmpty {
-            return true
-        }
-        let firstElement = self.first
-        for element in self.dropFirst() {
-            if element != firstElement {
-                return false
-            }
-        }
-        return true
+        return ArraySlice(self).allEqual()
     }
     
     func allDifferent() -> Bool {
-        if self.isEmpty {
-            return false
-        }
-        let firstElement = self.first
-        for element in self.dropFirst() {
-            if element == firstElement {
-                return false
-            }
-        }
-        if self.dropFirst().count == 1 {
-            return true
-        }
-        return self.dropFirst().allDifferent()
+        return ArraySlice(self).allDifferent()
     }
 }
