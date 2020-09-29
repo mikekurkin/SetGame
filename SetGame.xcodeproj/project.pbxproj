@@ -29,6 +29,7 @@
 /* Begin PBXFileReference section */
 		4D0BC21725198AC70025FAFA /* AnyShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyShape.swift; sourceTree = "<group>"; };
 		4D30F40B251F4608005BA249 /* Array+Equatable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array+Equatable.swift"; sourceTree = "<group>"; };
+		4D30F41925233A20005BA249 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		4D76867A25148DE400473B8C /* SetGame.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SetGame.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D76867D25148DE400473B8C /* SetGameApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetGameApp.swift; sourceTree = "<group>"; };
 		4D76867F25148DE400473B8C /* SetGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetGameView.swift; sourceTree = "<group>"; };
@@ -62,6 +63,7 @@
 		4D76867125148DE400473B8C = {
 			isa = PBXGroup;
 			children = (
+				4D30F41925233A20005BA249 /* README.md */,
 				4D76867C25148DE400473B8C /* SetGame */,
 				4D76867B25148DE400473B8C /* Products */,
 			);
@@ -319,6 +321,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"SetGame/Preview Content\"";
 				DEVELOPMENT_TEAM = MLVPKTGJDG;
@@ -331,6 +334,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = net.kurkin.SetGame;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -341,6 +345,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"SetGame/Preview Content\"";
 				DEVELOPMENT_TEAM = MLVPKTGJDG;
@@ -353,6 +358,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = net.kurkin.SetGame;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
