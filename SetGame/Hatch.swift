@@ -13,20 +13,21 @@ struct Hatch: View {
     var angle: Angle
     var lineWidth: CGFloat
     
-    private var linesDistance: Double { 1 / Double(numberOfLines + 1) }
+    private var sinA: CGFloat
     
-    private var linePositions: [CGFloat] {
-        Array(1...numberOfLines).map { index in
-            CGFloat(index) / CGFloat(numberOfLines + 1) - 0.5
-        }
-    }
+    private var linesDistance: Double
+    
+    private var linePositions: [CGFloat]
     
     private func hatchingWidth(for size: CGSize, at angle: Angle) -> CGFloat {
-        let center = CGPoint(x: size.width / 2, y: size.height / 2)
         
-        if sin(angle.radians) == 0 {
+        if sinA == 0 {
             return size.height
+        } else if sinA == 1 {
+            return size.width
         }
+        
+        let center = CGPoint(x: size.width / 2, y: size.height / 2)
         
         func line(x: CGFloat) -> CGFloat { CGFloat(tan(angle.radians)) * (x - center.x) + center.y }
         func line(y: CGFloat) -> CGFloat { (y - center.y) / CGFloat(tan(angle.radians)) + center.x }
@@ -56,6 +57,11 @@ struct Hatch: View {
         self.numberOfLines = numberOfLines
         self.lineWidth = lineWidth
         self.angle = angle
+        self.sinA = CGFloat(sin(angle.radians))
+        self.linesDistance =  1 / Double(numberOfLines + 1)
+        self.linePositions = Array(1...numberOfLines).map { index in
+            CGFloat(index) / CGFloat(numberOfLines + 1) - 0.5
+        }
     }
     
 //    init(distanceBetweenLines: Int) {
