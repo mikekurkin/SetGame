@@ -33,16 +33,7 @@ class SetGame: ObservableObject {
     }
     
     var cards: [SetLikeGame.Card] {
-        game.deck.filter{
-            game.onScreenCardIDs.contains($0.id)
-        }.sorted{
-            if let i0 = game.onScreenCardIDs.firstIndex(of: $0.id), let i1 = game.onScreenCardIDs.firstIndex(of: $1.id) {
-                return i0 < i1
-            } else {
-                return true
-            }
-        }
-//        return Array(game.deck.shuffled().prefix(upTo: 12))
+        game.onScreenCards
     }
     
     var unusedCardsCount: Int {

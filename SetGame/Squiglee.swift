@@ -82,9 +82,9 @@ struct Squiglee: InsettableShape {
         
         let squigleeCurve = BezierCurve(points: points)
         
-        let p = squigleeCurve.path
+        let p = squigleeCurve.path.applying(CGAffineTransform(scaleX: 1, y: -1)).applying(CGAffineTransform(translationX: 0, y: rect.height))
         
-        return p.applying(CGAffineTransform(scaleX: 1, y: -1)).applying(CGAffineTransform(translationX: 0, y: rect.height))
+        return p
     }
     
 }

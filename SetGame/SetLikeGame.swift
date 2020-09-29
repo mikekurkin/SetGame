@@ -14,15 +14,29 @@ struct SetLikeGame {
     
     private(set) var deck: [Card]
     
-    /// Contains `id`s of cards in the deck
+    /// Contains ordered `id`s of cards currently on screen
     private(set) var onScreenCardIDs: [Int] = []
     
+    /// Contains ordered cards currently on screen
+    var onScreenCards: [Card] {
+        deck.filter{
+            onScreenCardIDs.contains($0.id)
+        }.sorted{
+            if let i0 = onScreenCardIDs.firstIndex(of: $0.id),
+               let i1 = onScreenCardIDs.firstIndex(of: $1.id) {
+                return i0 < i1
+            } else {
+                return true
+            }
+        }
+    }
     
-    /// Arary that contains only selected cards
+    /// Contains only selected cards
     var selectedCards: [Card] {
         deck.filter{ $0.isSelected }
     }
     
+    /// Contains cards that did not appear on screen
     var unusedCards: [Card] {
         deck.filter{ !$0.wasInSet && !onScreenCardIDs.contains($0.id) }
     }
@@ -31,50 +45,31 @@ struct SetLikeGame {
     /// if selected cards actually form a set and sets all cards to not selected.
     mutating func select(_ card: Card) {
         if selectedCards.count == propertyValuesCount {
-            print(onScreenCardIDs)
-            for card in deck.filter({ onScreenCardIDs.contains($0.id) }) {
-                if card.wasInSet {
-                    if let cardIndex = onScreenCardIDs.firstIndex(of: card.id) {
-//                        onScreenCards.remove(at: cardIndex)
-                        if let replacementId = unusedCards.randomElement()?.id {
-                            onScreenCardIDs[cardIndex] = replacementId
-                        } else {
-                            onScreenCardIDs.remove(at: cardIndex)
-                        }
+            let selectedCardWasAlreadySelected = selectedCards.contains{ $0.id == card.id }
+            for card in onScreenCards {
+                if card.wasInSet,
+                   let cardIndex = onScreenCardIDs.firstIndex(of: card.id) {
+                    if let replacementID = unusedCards.randomElement()?.id {
+                        onScreenCardIDs[cardIndex] = replacementID
+                    } else {
+                        onScreenCardIDs.remove(at: cardIndex)
                     }
-//                    add(1)
                 }
-                
-                
             }
-            print(onScreenCardIDs)
             for index in 0..<deck.count {
                 deck[index].isSelected = false
             }
-            print(unusedCards.count)
-            
-            return
+            if selectedCardWasAlreadySelected {
+                return
+            }
         }
         deck[deck.firstIndex(matching: card)!].isSelected.toggle()
         if selectedCards.count == propertyValuesCount {
-            
-            
-//            let group = DispatchGroup()
-//            group.enter()
             if doFormSet(selectedCards) {
                 for card in selectedCards {
                     deck[deck.firstIndex(matching: card)!].wasInSet = true
                 }
             }
-            
-            
-//            for index in 0..<deck.count {
-//
-////                deck[index].isSelected = false
-//            }
-            
-            
-            
             
         }
     }
@@ -96,17 +91,15 @@ struct SetLikeGame {
             }
             print(property.propertyName, cardProperties[propertyIndex])
         }
+        
         let sameOrDifferent = cardProperties.map{ $0.allEqual() || $0.allDifferent() }
         print(sameOrDifferent)
         
         let isSet = sameOrDifferent.reduce(true) { $0 && $1 }
-        
         print(isSet)
         
         return isSet
     }
-    
-    
     
     /// Returns a deck containing all cards with unique combinations of properties.
     private static func generateDeck(with properties: [CardProperty], deck: [Card] = [], card: Card = Card(id: 0, properties: [:])) -> [Card] {
@@ -136,15 +129,6 @@ struct SetLikeGame {
         onScreenCardIDs = deck.shuffled().prefix(upTo: count).map{ $0.id }
     }
     
-//    mutating func deal(_ count: Int) {
-//        for _ in 0..<count {
-//            if let randomUnusedCard = unusedCards.randomElement(),
-//               let cardIndex = deck.firstIndex(matching: randomUnusedCard) {
-//                deck[cardIndex].isOnScreen = true
-//            }
-//        }
-//    }
-    
     mutating func add(_ count: Int) {
         onScreenCardIDs.append(contentsOf: unusedCards.shuffled().prefix(count).map{ $0.id })
     }
@@ -165,7 +149,6 @@ struct SetLikeGame {
         var properties: [String:PropertyValue]
         
         var isFaceUp: Bool = true
-        var isOnScreen: Bool = false
         var isSelected: Bool = false
         
         var wasInSet: Bool = false

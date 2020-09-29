@@ -34,28 +34,25 @@ struct ContentView: View {
             .padding()
             
             Grid(sg.cards, itemDesiredAspectRatio: 5 / 7) { card in
-//                ZStack {
-                    VStack(spacing: 0) {
-                        Spacer()
-                        ForEach(0..<sg.rank(for: card)) { _ in
-                            sg.form(for: card)
-                                .sgFill(sg.fill(for: card))
-                                .aspectRatio(2, contentMode: .fit)
-                                .padding(.vertical, 5)
-                        }
-                        .foregroundColor(sg.hue(for: card))
-                        .padding(.horizontal, 20)
-                        Spacer()
+                VStack(spacing: 0) {
+                    Spacer()
+                    ForEach(0..<sg.rank(for: card)) { _ in
+                        sg.form(for: card)
+                            .sgFill(sg.fill(for: card))
+                            .aspectRatio(2, contentMode: .fit)
+                            .padding(.vertical, 5)
                     }
-                    .cardify(isFaceUp: true, cardBack: Rectangle().fill())
-                    .aspectRatio(5/7, contentMode: .fit)
-                    .clipped()
-                    .scaleEffect(card.isSelected ? 1.04 : 1)
-                    .shadow(color: card.wasInSet ? Color.green : Color.primary.opacity(0.6), radius: (card.isSelected ? 10 : 1.5))
-                    .onTapGesture { withAnimation(.easeInOut(duration: 0.05)) { sg.select(card) } }
-                    .padding(5)
-                    
-//                }
+                    .foregroundColor(sg.hue(for: card))
+                    .padding(.horizontal, 20)
+                    Spacer()
+                }
+                .cardify(isFaceUp: card.isFaceUp, cardBack: Rectangle().fill())
+                .aspectRatio(5/7, contentMode: .fit)
+                .clipped()
+                .scaleEffect(card.isSelected ? 1.04 : 1)
+                .shadow(color: card.wasInSet ? Color.green : Color.primary.opacity(0.6), radius: (card.isSelected ? 10 : 1.5))
+                .onTapGesture { withAnimation(.easeInOut(duration: 0.05)) { sg.select(card) } }
+                .padding(5)
             }
             .foregroundColor(.purple)
             .padding()
