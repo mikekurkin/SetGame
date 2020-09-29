@@ -9,10 +9,17 @@ import Foundation
 
 struct SetLikeGame {
     
-    private var properties: [CardProperty]
-    private var propertyValuesCount: Int
+    private var features: [CardFeature]
+    private(set) var featureValuesCount: Int
     
     private(set) var deck: [Card]
+    
+    private(set) var initialCardsCount: Int
+    
+    private(set) var score: Int = 0
+    
+    private let scoreReward =  +1
+    private let scorePenalty = -1
     
     /// Contains ordered `id`s of cards currently on screen
     private(set) var onScreenCardIDs: [Int] = []
@@ -44,12 +51,31 @@ struct SetLikeGame {
     /// Toggles `card`'s `isSelected`, if enough cards for a set is selected, checks
     /// if selected cards actually form a set and sets all cards to not selected.
     mutating func select(_ card: Card) {
-        if selectedCards.count == propertyValuesCount {
-            let selectedCardWasAlreadySelected = selectedCards.contains{ $0.id == card.id }
+        clearSelection()
+        if card.wasInSet {
+            return
+        }
+        deck[deck.firstIndex(matching: card)!].isSelected.toggle()
+        if selectedCards.count == featureValuesCount {
+            if doFormSet(selectedCards) {
+                for card in selectedCards {
+                    deck[deck.firstIndex(matching: card)!].wasInSet = true
+                }
+                score += scoreReward
+            } else {
+                score += scorePenalty
+            }
+        }
+    }
+    
+    /// Takes care of previously selected cards after set is checked
+    mutating private func clearSelection() {
+        if selectedCards.count == featureValuesCount {
             for card in onScreenCards {
                 if card.wasInSet,
                    let cardIndex = onScreenCardIDs.firstIndex(of: card.id) {
-                    if let replacementID = unusedCards.randomElement()?.id {
+                    if onScreenCards.count <= initialCardsCount,
+                       let replacementID = unusedCards.randomElement()?.id {
                         onScreenCardIDs[cardIndex] = replacementID
                     } else {
                         onScreenCardIDs.remove(at: cardIndex)
@@ -59,40 +85,28 @@ struct SetLikeGame {
             for index in 0..<deck.count {
                 deck[index].isSelected = false
             }
-            if selectedCardWasAlreadySelected {
-                return
-            }
-        }
-        deck[deck.firstIndex(matching: card)!].isSelected.toggle()
-        if selectedCards.count == propertyValuesCount {
-            if doFormSet(selectedCards) {
-                for card in selectedCards {
-                    deck[deck.firstIndex(matching: card)!].wasInSet = true
-                }
-            }
-            
         }
     }
     
-    /// Returns true if for `cards` it is true that either all the properties
+    /// Returns true if for `cards` it is true that either all the features
     /// are the same or they are all different.
     func doFormSet(_ cards: [Card]) -> Bool {
-        if cards.count != propertyValuesCount {
+        if cards.count != featureValuesCount {
             return false
         }
         
         print(cards.map{$0.description})
         
-        var cardProperties: [[String]] = []
-        for (propertyIndex, property) in properties.enumerated() {
-            cardProperties.append([])
+        var cardFeatures: [[String]] = []
+        for (featureIndex, feature) in features.enumerated() {
+            cardFeatures.append([])
             for card in cards {
-                cardProperties[propertyIndex].append(card.properties[property.propertyName]?.rawValue ?? "")
+                cardFeatures[featureIndex].append(card.features[feature.featureName]?.rawValue ?? "")
             }
-            print(property.propertyName, cardProperties[propertyIndex])
+            print(feature.featureName, cardFeatures[featureIndex])
         }
         
-        let sameOrDifferent = cardProperties.map{ $0.allEqual() || $0.allDifferent() }
+        let sameOrDifferent = cardFeatures.map{ $0.allEqual() || $0.allDifferent() }
         print(sameOrDifferent)
         
         let isSet = sameOrDifferent.reduce(true) { $0 && $1 }
@@ -101,21 +115,21 @@ struct SetLikeGame {
         return isSet
     }
     
-    /// Returns a deck containing all cards with unique combinations of properties.
-    private static func generateDeck(with properties: [CardProperty], deck: [Card] = [], card: Card = Card(id: 0, properties: [:])) -> [Card] {
+    /// Returns a deck containing all cards with unique combinations of features.
+    private static func generateDeck(with features: [CardFeature], deck: [Card] = [], card: Card = Card(id: 0, features: [:])) -> [Card] {
             
-        var properties = properties
+        var features = features
         var deck = deck
         var card = card
         
-        if !properties.isEmpty {
-            for value in properties.removeLast().values {
-                card.properties.updateValue(value, forKey: value.propertyName)
-                if properties.isEmpty {
+        if !features.isEmpty {
+            for value in features.removeLast().values {
+                card.features.updateValue(value, forKey: value.featureName)
+                if features.isEmpty {
                     card.id = deck.count
                     deck.append(card)
                 } else {
-                    deck = generateDeck(with: properties, deck: deck, card: card)
+                    deck = generateDeck(with: features, deck: deck, card: card)
                 }
             }
         }
@@ -133,20 +147,22 @@ struct SetLikeGame {
         onScreenCardIDs.append(contentsOf: unusedCards.shuffled().prefix(count).map{ $0.id })
     }
     
-    init?(properties: [CardProperty]) {
-        let propertyValuesCounts = properties.map { $0.values.count }
-        if !propertyValuesCounts.allEqual() {
+    init?(features: [CardFeature], cardsCount: Int) {
+        let featureValuesCounts = features.map { $0.values.count }
+        if !featureValuesCounts.allEqual() {
             return nil
         }
-        self.propertyValuesCount = propertyValuesCounts.first ?? 0
-        self.properties = properties
-        self.deck = SetLikeGame.generateDeck(with: properties).shuffled()
+        self.featureValuesCount = featureValuesCounts.first ?? 0
+        self.features = features
+        self.deck = SetLikeGame.generateDeck(with: features).shuffled()
+        self.initialCardsCount = cardsCount
+        deal(self.initialCardsCount)
     }
     
     
     struct Card: Identifiable {
         var id: Int
-        var properties: [String:PropertyValue]
+        var features: [String:FeatureValue]
         
         var isFaceUp: Bool = true
         var isSelected: Bool = false
@@ -155,27 +171,27 @@ struct SetLikeGame {
         
         var description: String {
             var res = "\(id):"
-            for property in properties {
-                res += " \(property.value.description)"
+            for feature in features {
+                res += " \(feature.value.description)"
             }
             return res
         }
     }
     
-    struct CardProperty {
-        let values: [PropertyValue]
-        var propertyName: String
+    struct CardFeature {
+        let values: [FeatureValue]
+        var featureName: String
         
-        init(_ values: [PropertyValue]) {
+        init(_ values: [FeatureValue]) {
             self.values = values
-            self.propertyName = values.first?.propertyName ?? ""
+            self.featureName = values.first?.featureName ?? ""
         }
     }
 }
 
-protocol PropertyValue {
+protocol FeatureValue {
     var description: String { get }
     var rawValue: String { get }
-    var propertyName: String { get }
+    var featureName: String { get }
     var value: Any? { get }
 }

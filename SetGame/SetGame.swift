@@ -14,22 +14,25 @@ class SetGame: ObservableObject {
     
     private static func createSetGame() -> SetLikeGame {
         
-        let ranks = SetLikeGame.CardProperty(Rank.allCases)
-        let forms = SetLikeGame.CardProperty(Form.allCases)
-        let hues = SetLikeGame.CardProperty(Hue.allCases)
-        let fills = SetLikeGame.CardProperty(Fill.allCases)
+        let ranks = SetLikeGame.CardFeature(Rank.allCases)
+        let forms = SetLikeGame.CardFeature(Form.allCases)
+        let hues = SetLikeGame.CardFeature(Hue.allCases)
+        let shadings = SetLikeGame.CardFeature(Shading.allCases)
         
-        guard var game = SetLikeGame(properties: [forms, hues, fills, ranks]) else {
+        guard let game = SetLikeGame(features: [forms, hues, shadings, ranks], cardsCount: 12) else {
             fatalError()
         }
         
-        game.deal(12)
         return game
     }
     
     
-    var deck: [SetLikeGame.Card] {
-        game.deck
+//    var deck: [SetLikeGame.Card] {
+//        game.deck
+//    }
+    
+    var cardsInSetCount: Int {
+        game.featureValuesCount
     }
     
     var cards: [SetLikeGame.Card] {
@@ -40,9 +43,18 @@ class SetGame: ObservableObject {
         game.unusedCards.count
     }
     
+    var score: Int {
+        game.score
+    }
+    
+    var selectedCardsCount: Int {
+        game.selectedCards.count
+    }
+    
     var selectedSet: Bool {
         game.doFormSet(game.selectedCards)
     }
+    
     
     func select(_ card: SetLikeGame.Card) {
         game.select(card)
@@ -52,16 +64,12 @@ class SetGame: ObservableObject {
         game = SetGame.createSetGame()
     }
     
-    func deal(_ count: Int) {
-        game.deal(count)
-    }
-    
-    func add(_ count: Int) {
-        game.add(count)
+    func addThree() {
+        game.add(3)
     }
     
     func rank(for card: SetLikeGame.Card) -> Int {
-        guard let rank = card.properties["rank"]?.value as? Int else {
+        guard let rank = card.features["rank"]?.value as? Int else {
             return 0
         }
         return rank
@@ -69,7 +77,7 @@ class SetGame: ObservableObject {
     
     
     func form(for card: SetLikeGame.Card) -> AnyInsettableShape {
-        if let shape = card.properties["form"]?.value as? AnyInsettableShape {
+        if let shape = card.features["form"]?.value as? AnyInsettableShape {
             return shape
         } else {
             return AnyInsettableShape(Rectangle())
@@ -77,14 +85,14 @@ class SetGame: ObservableObject {
     }
     
     func hue(for card: SetLikeGame.Card) -> Color {
-        guard let hue = card.properties["hue"]?.value as? Color else {
+        guard let hue = card.features["hue"]?.value as? Color else {
             return Color.black
         }
         return hue
     }
     
     func fill(for card: SetLikeGame.Card) -> String {
-        guard let fill = card.properties["fill"]?.description else {
+        guard let fill = card.features["shading"]?.description else {
             return ""
         }
         return fill
@@ -93,12 +101,12 @@ class SetGame: ObservableObject {
 
 
 
-enum Rank: String, CaseIterable, PropertyValue {
+enum Rank: String, CaseIterable, FeatureValue {
     case one
     case two
     case three
     
-    var propertyName: String { "rank" }
+    var featureName: String { "rank" }
     var description: String { self.rawValue }
     
     var value: Any? {
@@ -110,30 +118,30 @@ enum Rank: String, CaseIterable, PropertyValue {
     }
 }
 
-enum Form: String, CaseIterable, PropertyValue {
+enum Form: String, CaseIterable, FeatureValue {
     case oval
     case diamond
-    case squiglee
+    case squiggle
     
-    var propertyName: String { "form" }
+    var featureName: String { "form" }
     var description: String { self.rawValue }
     
     var value: Any? {
         switch self {
             case .oval: return AnyInsettableShape(Capsule())
             case .diamond: return AnyInsettableShape(Diamond())
-            case .squiglee: return AnyInsettableShape(Squiglee())
+            case .squiggle: return AnyInsettableShape(Squiggle())
         }
     }
 }
 
-enum Hue: String, CaseIterable, PropertyValue {
+enum Hue: String, CaseIterable, FeatureValue {
     
     case red
     case green
     case purple
     
-    var propertyName: String { "hue" }
+    var featureName: String { "hue" }
     var description: String { self.rawValue }
     
     var value: Any? {
@@ -145,12 +153,12 @@ enum Hue: String, CaseIterable, PropertyValue {
     }
 }
 
-enum Fill: String, CaseIterable, PropertyValue {
+enum Shading: String, CaseIterable, FeatureValue {
     case stroked
-    case shaded
-    case filled
+    case striped
+    case solid
     
-    var propertyName: String { "fill" }
+    var featureName: String { "shading" }
     var description: String { self.rawValue }
     
     var value: Any? { nil }

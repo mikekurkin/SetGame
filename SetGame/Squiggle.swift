@@ -1,5 +1,5 @@
 //
-//  Squiglee.swift
+//  Squiggle.swift
 //  SetGame
 //
 //  Created by Mike Kurkin on 18.09.2020.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct Squiglee: InsettableShape {
+struct Squiggle: InsettableShape {
     
     var insetAmount: CGFloat = 0
     
@@ -80,18 +80,18 @@ struct Squiglee: InsettableShape {
                         controlLength: relX(0.07))
         )
         
-        let squigleeCurve = BezierCurve(points: points)
+        let squiggleCurve = BezierCurve(points: points)
         
-        let p = squigleeCurve.path.applying(CGAffineTransform(scaleX: 1, y: -1)).applying(CGAffineTransform(translationX: 0, y: rect.height))
+        let p = squiggleCurve.path.applying(CGAffineTransform(scaleX: 1, y: -1)).applying(CGAffineTransform(translationX: 0, y: rect.height))
         
         return p
     }
     
 }
 
-struct Squiglee_Preview: PreviewProvider {
+struct Squiggle_Preview: PreviewProvider {
     static var previews: some View {
-        Squiglee()
+        Squiggle()
             .strokeBorder(lineWidth: 10)
             .aspectRatio(2, contentMode: .fit)
             .padding()
