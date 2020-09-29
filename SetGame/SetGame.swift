@@ -9,7 +9,7 @@ import SwiftUI
 
 class SetGame: ObservableObject {
     
-    @Published private var game = createSetGame()
+    @Published private var game = SetGame.createSetGame()
     
     
     private static func createSetGame() -> SetLikeGame {
@@ -33,14 +33,32 @@ class SetGame: ObservableObject {
     }
     
     var cards: [SetLikeGame.Card] {
-        deck.filter{
-            game.onScreenCards.contains($0.id)
+        game.deck.filter{
+            game.onScreenCardIDs.contains($0.id)
+        }.sorted{
+            if let i0 = game.onScreenCardIDs.firstIndex(of: $0.id), let i1 = game.onScreenCardIDs.firstIndex(of: $1.id) {
+                return i0 < i1
+            } else {
+                return true
+            }
         }
 //        return Array(game.deck.shuffled().prefix(upTo: 12))
     }
     
+    var unusedCardsCount: Int {
+        game.unusedCards.count
+    }
+    
+    var selectedSet: Bool {
+        game.doFormSet(game.selectedCards)
+    }
+    
     func select(_ card: SetLikeGame.Card) {
         game.select(card)
+    }
+    
+    func newGame() {
+        game = SetGame.createSetGame()
     }
     
     func deal(_ count: Int) {

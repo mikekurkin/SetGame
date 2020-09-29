@@ -16,14 +16,16 @@ struct ContentView: View {
                 Text("Set Game").bold()
                 Spacer()
                 HStack(spacing: 25) {
+                    Text(String(sg.unusedCardsCount)).bold()
                     Button {
                         withAnimation(.easeInOut) {
                             sg.add(3)
                         }
                     } label: { Image(systemName: "plus") }
+                        .disabled(sg.unusedCardsCount == 0)
                     Button {
                         withAnimation(.easeInOut) {
-                            sg.deal(12)
+                            sg.newGame()
                         }
                     } label: { Image(systemName: "shuffle") }
                 }
@@ -47,9 +49,10 @@ struct ContentView: View {
                     }
                     .cardify(isFaceUp: true, cardBack: Rectangle().fill())
                     .aspectRatio(5/7, contentMode: .fit)
+                    .clipped()
                     .scaleEffect(card.isSelected ? 1.04 : 1)
-                    .shadow(color: Color.purple.opacity(card.isSelected ? 0.5 : 0), radius: 10)
-                    .onTapGesture { sg.select(card) }
+                    .shadow(color: card.wasInSet ? Color.green : Color.primary.opacity(0.6), radius: (card.isSelected ? 10 : 1.5))
+                    .onTapGesture { withAnimation(.easeInOut(duration: 0.05)) { sg.select(card) } }
                     .padding(5)
                     
 //                }
@@ -69,6 +72,7 @@ extension InsettableShape {
                 case "stroked":
                     self.fill().opacity(0)
                 case "shaded":
+//                    self.fill().opacity(0.2)
                     Hatch(20, at: Angle(degrees: 90), lineWidth: 0.7)
                         .clipShape(self)
                 case "filled":
