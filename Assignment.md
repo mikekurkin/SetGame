@@ -44,7 +44,7 @@ For each of the attributes cards should be either all the same, or all different
 - [ ] when card is touched with a set selected
   - [x] cards are replaced with new ones from deck
   - [ ] matched cards fly away with animation
-  - [ ] replacement cards fly in with animation
+  - [x] replacement cards fly in with animation
   - [x] if deck is empty free space is used for remaining cards
   - [x] if touched card is not part of set it is selected
 - [x] when card is touched with a non-set selected
@@ -53,10 +53,10 @@ For each of the attributes cards should be either all the same, or all different
 - [ ] there is add three cards button
   - [ ] when it is touched selected cards get replaced if they are set
   - [x] if there is no set selected three cards get added
-  - [ ] button is deactivated when the deck is empty
-- [ ] there is a new game button
+  - [x] button is deactivated when the deck is empty
+- [x] there is a new game button
   - [x] it deals twelve randomly chosen cards
-  - [ ] cards fly in and out with animation
+  - [x] cards fly in and out with animation
 - [x] the squiggle is an actual squiggle
 - [x] the diamond is a custom shaped diamond
 - [x] striped shading is present
@@ -69,8 +69,8 @@ For each of the attributes cards should be either all the same, or all different
 
 ### Extra credit:
 
-- [ ] cards fly in from the deck
-- [ ] cards flip from face down when they fly in
+- [x] cards fly in from the deck
+- [x] cards flip from face down when they fly in
 - [x] actual squiggle is drawn
 - [x] actual striped shading is drawn
 - [ ] animation is shown when cards are matched

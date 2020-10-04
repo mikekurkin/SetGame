@@ -57,7 +57,10 @@ struct Cardify<BackContent>: AnimatableModifier where BackContent: View {
 }
 
 extension View {
-    func cardify<BackContent>(isFaceUp: Bool, cardBack: BackContent) -> some View where BackContent: View {
+    func cardify<BackContent>(isFaceUp: Bool = true, cardBack: BackContent) -> some View where BackContent: View {
         self.modifier(Cardify(isFaceUp: isFaceUp, cardBack: cardBack))
+    }
+    func cardify(isFaceUp: Bool = true) -> some View {
+        self.modifier(Cardify(isFaceUp: isFaceUp, cardBack: Rectangle().fill()))
     }
 }

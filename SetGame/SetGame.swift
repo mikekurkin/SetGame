@@ -35,6 +35,10 @@ class SetGame: ObservableObject {
         game.featureValuesCount
     }
     
+    var initialCardsCount: Int {
+        game.initialCardsCount
+    }
+    
     var cards: [SetLikeGame.Card] {
         game.onScreenCards
     }
@@ -62,10 +66,21 @@ class SetGame: ObservableObject {
     
     func newGame() {
         game = SetGame.createSetGame()
+        deal()
+    }
+    
+    func deal() {
+        game.deal(initialCardsCount)
     }
     
     func addThree() {
         game.add(3)
+    }
+    
+    func turnOverOnScreenCards() {
+        for card in cards {
+            game.setFaceUp(card)
+        }
     }
     
     func rank(for card: SetLikeGame.Card) -> Int {
@@ -128,7 +143,7 @@ enum Form: String, CaseIterable, FeatureValue {
     
     var value: Any? {
         switch self {
-            case .oval: return AnyInsettableShape(Capsule())
+        case .oval: return AnyInsettableShape(Capsule())
             case .diamond: return AnyInsettableShape(Diamond())
             case .squiggle: return AnyInsettableShape(Squiggle())
         }

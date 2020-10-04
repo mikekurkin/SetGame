@@ -22,7 +22,15 @@ struct SetLikeGame {
     private let scorePenalty = -1
     
     /// Contains ordered `id`s of cards currently on screen
-    private(set) var onScreenCardIDs: [Int] = []
+    private(set) var onScreenCardIDs: [Int] = [] {
+        didSet {
+            for card in onScreenCards {
+                if let cardIndex = deck.firstIndex(matching: card) {
+                    deck[cardIndex].isOnScreen = true
+                }
+            }
+        }
+    }
     
     /// Contains ordered cards currently on screen
     var onScreenCards: [Card] {
@@ -147,6 +155,12 @@ struct SetLikeGame {
         onScreenCardIDs.append(contentsOf: unusedCards.shuffled().prefix(count).map{ $0.id })
     }
     
+    mutating func setFaceUp(_ card: Card) {
+        if let cardIndex = deck.firstIndex(matching: card) {
+            deck[cardIndex].isFaceUp = true
+        }
+    }
+    
     init?(features: [CardFeature], cardsCount: Int) {
         let featureValuesCounts = features.map { $0.values.count }
         if !featureValuesCounts.allEqual() {
@@ -156,7 +170,7 @@ struct SetLikeGame {
         self.features = features
         self.deck = SetLikeGame.generateDeck(with: features).shuffled()
         self.initialCardsCount = cardsCount
-        deal(self.initialCardsCount)
+//        deal(self.initialCardsCount)
     }
     
     
@@ -164,7 +178,8 @@ struct SetLikeGame {
         var id: Int
         var features: [String:FeatureValue]
         
-        var isFaceUp: Bool = true
+        var isOnScreen: Bool = false
+        var isFaceUp: Bool = false
         var isSelected: Bool = false
         
         var wasInSet: Bool = false
