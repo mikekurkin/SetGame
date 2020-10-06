@@ -24,19 +24,32 @@ struct ContentView: View {
                         Button {
                             withAnimation(.easeInOut) {
                                 sg.addThree()
+                                for card in sg.cards {
+                                    withAnimation(Animation.easeInOut(duration: 1.0)) {
+                                        sg.turnOver(card)
+                                    }
+                                    print(sg.cards.map { "\($0.id): \($0.isFaceUp)" } )
+                                }
                             }
                         } label: { Image(systemName: "plus") }
                             .disabled(sg.unusedCardsCount == 0)
                         Button {
                             withAnimation(.easeInOut) {
                                 sg.newGame()
+                                for card in sg.cards {
+                                    withAnimation(Animation.easeInOut(duration: 1.0).delay(0.05 * Double((sg.cards.firstIndex(matching: card) ?? 0)))) {
+                                        sg.turnOver(card)
+                                    }
+                                    print(sg.cards.map { "\($0.id): \($0.isFaceUp)" } )
+                                }
                             }
+                            
                         } label: { Image(systemName: "shuffle") }
                     }
-                    ZStack{
+                    ZStack {
                         GeometryReader { geometry in
-                            Group{
-                                Group {}
+                            Group {
+                                EmptyView()
                                     .cardify(isFaceUp: false)
                                     
                             }
@@ -60,12 +73,14 @@ struct ContentView: View {
                             .foregroundColor(.white)
                     }
                     .foregroundColor(.purple)
+                    
                 }
             }
             .font(.title)
             .padding(.horizontal, 25)
             .padding(.top, 25)
             .padding(.bottom, 0)
+            .zIndex(1)
                 
             Grid(sg.cards, itemDesiredAspectRatio: 5 / 7) { card in
                 GeometryReader { geometry in
@@ -87,7 +102,6 @@ struct ContentView: View {
                             }
                             .cardify(isFaceUp: card.isFaceUp)
                             .aspectRatio(5/7, contentMode: .fit)
-                            .clipped()
                             .scaleEffect(card.isSelected ? 1.04 : 1)
                             .shadow(color: (card.isSelected && sg.selectedCardsCount == sg.cardsInSetCount) ?
                                         (sg.selectedSet ? Color.green : Color.red) : Color.primary.opacity(0.6),
@@ -95,19 +109,25 @@ struct ContentView: View {
                             .padding(5)
                             .onTapGesture {
                                 withAnimation(.easeInOut(duration: 0.02)) { sg.select(card) }
+                                for card in sg.cards {
+                                    withAnimation(Animation.easeInOut(duration: 1.0)) {
+                                        sg.turnOver(card)
+                                    }
+                                    print(sg.cards.map { "\($0.id): \($0.isFaceUp)" } )
+                                }
                             }
                         }
-                        .scaleEffect(x: card.isFaceUp ? 1.0 : deckFrame.size.width / cardFrame.size.width,
-                                     y: card.isFaceUp ? 1.0 : deckFrame.size.height / cardFrame.size.height,
-                                     anchor: .topLeading)
+                        .frame(width: card.isFaceUp ? cardFrame.size.width : deckFrame.size.width,
+                               height: card.isFaceUp ? cardFrame.size.height : deckFrame.size.height)
                         .offset(x: card.isFaceUp ? 0 : deckFrame.origin.x - cardFrame.origin.x,
                                 y: card.isFaceUp ? 0 : deckFrame.origin.y - cardFrame.origin.y)
+                        
                         
 //                    }
                     
                 }
                 .onAppear {
-                    withAnimation(.easeInOut(duration: 1.0)){ sg.turnOverOnScreenCards() }
+                    
                 }
                 
             }
@@ -118,6 +138,12 @@ struct ContentView: View {
                     deadline: .now() + 0.2,
                     execute: {
                         withAnimation(.easeInOut(duration: 0.5)) { sg.deal() }
+                        for card in sg.cards {
+                            withAnimation(Animation.easeInOut(duration: 1.0).delay(0.05 * Double((sg.cards.firstIndex(matching: card) ?? 0)))) {
+                                sg.turnOver(card)
+                            }
+                            print(sg.cards.map { "\($0.id): \($0.isFaceUp)" } )
+                        }
                     }
                 )
             }
@@ -135,7 +161,6 @@ extension InsettableShape {
                     self.fill().opacity(0)
                 case "striped":
 //                    self.fill().opacity(0.8)
-                    // FIXME: - Something wrong happens here with squiggle and diamond
                     Hatch(14, at: Angle(degrees: 90), lineWidth: 1)
                         .clipShape(self)
                 case "solid":

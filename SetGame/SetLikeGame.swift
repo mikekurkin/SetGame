@@ -26,7 +26,10 @@ struct SetLikeGame {
         didSet {
             for card in onScreenCards {
                 if let cardIndex = deck.firstIndex(matching: card) {
-                    deck[cardIndex].isOnScreen = true
+                    deck[cardIndex].isOnScreen = onScreenCards.contains { $0.id == card.id }
+                    if !deck[cardIndex].isOnScreen {
+                        deck[cardIndex].isFaceUp = false
+                    }
                 }
             }
         }
@@ -157,7 +160,10 @@ struct SetLikeGame {
     
     mutating func setFaceUp(_ card: Card) {
         if let cardIndex = deck.firstIndex(matching: card) {
+            print(deck[cardIndex].id, terminator: ": ")
+            print(deck[cardIndex].isFaceUp, terminator: " -> ")
             deck[cardIndex].isFaceUp = true
+            print(deck[cardIndex].isFaceUp)
         }
     }
     

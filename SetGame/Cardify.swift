@@ -42,6 +42,7 @@ struct Cardify<BackContent>: AnimatableModifier where BackContent: View {
                 .clipShape(RoundedRectangle(cornerRadius: cardCornerRadius, style: cardCornerStyle))
                 .opacity(isFaceUp ? 0 : 1)
         }
+        .clipped()
         .rotation3DEffect(
             Angle.degrees(rotation),
             axis: (x: 0, y: 1, z: 0)

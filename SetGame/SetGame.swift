@@ -83,6 +83,10 @@ class SetGame: ObservableObject {
         }
     }
     
+    func turnOver(_ card: SetLikeGame.Card) {
+        game.setFaceUp(card)
+    }
+    
     func rank(for card: SetLikeGame.Card) -> Int {
         guard let rank = card.features["rank"]?.value as? Int else {
             return 0
