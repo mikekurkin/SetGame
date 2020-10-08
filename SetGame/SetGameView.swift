@@ -16,55 +16,37 @@ struct ContentView: View {
         VStack {
             HStack(alignment: .top) {
                 Text("Set").bold()
+                
                 Spacer()
-                HStack(alignment: .top, spacing: 25) {
-                    HStack(spacing: 25) {
+                
+                HStack(alignment: .top, spacing: standardPadding) {
+                    HStack(spacing: standardPadding) {
                         Text(String(sg.score)).bold()
                         
                         Button {
-                            withAnimation(.easeInOut) {
-                                sg.addThree()
-                                for card in sg.cards {
-                                    withAnimation(Animation.easeInOut(duration: 1.0)) {
-                                        sg.turnOver(card)
-                                    }
-                                    print(sg.cards.map { "\($0.id): \($0.isFaceUp)" } )
-                                }
-                            }
+                            dealWithAnimation { sg.addThree() }
                         } label: { Image(systemName: "plus") }
                             .disabled(sg.unusedCardsCount == 0)
+                        
                         Button {
-                            withAnimation(.easeInOut) {
-                                sg.newGame()
-                                for card in sg.cards {
-                                    withAnimation(Animation.easeInOut(duration: 1.0).delay(0.05 * Double((sg.cards.firstIndex(matching: card) ?? 0)))) {
-                                        sg.turnOver(card)
-                                    }
-                                    print(sg.cards.map { "\($0.id): \($0.isFaceUp)" } )
-                                }
-                            }
-                            
+                            dealWithAnimation { sg.newGame() }
                         } label: { Image(systemName: "shuffle") }
+                        
                     }
                     ZStack {
                         GeometryReader { geometry in
-                            Group {
-                                EmptyView()
-                                    .cardify(isFaceUp: false)
-                                    
-                            }
-                            .onAppear {
-                                let frame = geometry.frame(in: .global)
-                                deckFrame = frame
-                                print(frame)
-                            }
-                            .onChange(of: geometry.frame(in: .global)) { frame in
-                                deckFrame = frame
-                                print(frame)
-                            }
+                            EmptyView()
+                                .cardify(isFaceUp: false)
+                                .onAppear {
+                                    let frame = geometry.frame(in: .global)
+                                    deckFrame = frame
+                                }
+                                .onChange(of: geometry.frame(in: .global)) { frame in
+                                    deckFrame = frame
+                                }
                         }
-                        .aspectRatio(5/7, contentMode: .fit)
-                        .frame(height: 80)
+                        .aspectRatio(cardAspectRatio, contentMode: .fit)
+                        .frame(height: deckHeight)
                             
                                 
                         Text(String(sg.unusedCardsCount))
@@ -77,109 +59,98 @@ struct ContentView: View {
                 }
             }
             .font(.title)
-            .padding(.horizontal, 25)
-            .padding(.top, 25)
-            .padding(.bottom, 0)
+            .padding(Edge.Set.horizontal.union(.top), standardPadding)
             .zIndex(1)
                 
-            Grid(sg.cards, itemDesiredAspectRatio: 5 / 7) { card in
-                GeometryReader { geometry in
-                    let cardFrame = geometry.frame(in: .global)
-//                    if card.isOnScreen {
-                        Group {
-                            VStack(spacing: 0) {
-                                Spacer()
-                                ForEach(0..<sg.rank(for: card)) { _ in
-                                    
-                                        sg.form(for: card)
-                                        .sgFill(sg.fill(for: card))
-                                        .aspectRatio(2, contentMode: .fit)
-                                        .padding(.vertical, 5)
-                                }
-                                .foregroundColor(sg.hue(for: card))
-                                .padding(.horizontal, 20)
-                                Spacer()
-                            }
-                            .cardify(isFaceUp: card.isFaceUp)
-                            .aspectRatio(5/7, contentMode: .fit)
-                            .scaleEffect(card.isSelected ? 1.04 : 1)
-                            .shadow(color: (card.isSelected && sg.selectedCardsCount == sg.cardsInSetCount) ?
-                                        (sg.selectedSet ? Color.green : Color.red) : Color.primary.opacity(0.6),
-                                    radius: (card.isSelected ? 10 : 1.5))
-                            .padding(5)
-                            .onTapGesture {
-                                withAnimation(.easeInOut(duration: 0.02)) { sg.select(card) }
-                                for card in sg.cards {
-                                    withAnimation(Animation.easeInOut(duration: 1.0)) {
-                                        sg.turnOver(card)
-                                    }
-                                    print(sg.cards.map { "\($0.id): \($0.isFaceUp)" } )
-                                }
-                            }
-                        }
-                        .frame(width: card.isFaceUp ? cardFrame.size.width : deckFrame.size.width,
-                               height: card.isFaceUp ? cardFrame.size.height : deckFrame.size.height)
-                        .offset(x: card.isFaceUp ? 0 : deckFrame.origin.x - cardFrame.origin.x,
-                                y: card.isFaceUp ? 0 : deckFrame.origin.y - cardFrame.origin.y)
-                        
-                        
-//                    }
-                    
-                }
-                .onAppear {
-                    
-                }
+            Grid(sg.cards, itemDesiredAspectRatio: Double(cardAspectRatio)) { card in
                 
+                GeometryReader { geometry in
+                    
+                    let cardFrame = geometry.frame(in: .global)
+
+                    Group {
+                        VStack(spacing: 0) {
+                            Spacer()
+                            ForEach(0..<sg.rank(for: card)) { _ in
+                                sg.shaded(sg.form(for: card), for: card)
+                                .aspectRatio(2, contentMode: .fit)
+                                .padding(.vertical, 5)
+                            }
+                            .foregroundColor(sg.hue(for: card))
+                            .padding(.horizontal, 20)
+                            Spacer()
+                        }
+                        .cardify(isFaceUp: card.isFaceUp)
+                    }
+                    .frame(width: card.isFaceUp ? cardFrame.size.width : deckFrame.size.width,
+                           height: card.isFaceUp ? cardFrame.size.height : deckFrame.size.height)
+                    .offset(x: card.isFaceUp ? 0 : deckFrame.origin.x - cardFrame.origin.x,
+                            y: card.isFaceUp ? 0 : deckFrame.origin.y - cardFrame.origin.y)
+                    
+                }
+                .aspectRatio(cardAspectRatio, contentMode: .fit)
+                .scaleEffect(card.isSelected ? selectedCardScale : 1.0)
+                .shadow(color: (card.isSelected && sg.selectedCardsCount == sg.cardsInSetCount) ?
+                            (sg.selectedSet ? Color.green : Color.red) : Color.primary.opacity(cardShadowOpacity),
+                        radius: (card.isSelected ? selectedCardShadowRadius : notSelectedCardShadowRadius))
+                .padding(smallPadding)
+                .onTapGesture {
+                    dealWithAnimation(cardSelectAnimation) { sg.select(card) }
+                }
+                .transition(AnyTransition.asymmetric(insertion: .identity, removal: .move(edge: .bottom)))
             }
             .foregroundColor(.purple)
             .padding()
             .onAppear {
-                DispatchQueue.main.asyncAfter(
-                    deadline: .now() + 0.2,
-                    execute: {
-                        withAnimation(.easeInOut(duration: 0.5)) { sg.deal() }
-                        for card in sg.cards {
-                            withAnimation(Animation.easeInOut(duration: 1.0).delay(0.05 * Double((sg.cards.firstIndex(matching: card) ?? 0)))) {
-                                sg.turnOver(card)
-                            }
-                            print(sg.cards.map { "\($0.id): \($0.isFaceUp)" } )
-                        }
-                    }
-                )
+                DispatchQueue.main.asyncAfter(deadline: .now() + cardDealDelay) {
+                    dealWithAnimation { sg.deal() }
+                }
             }
         }
     }
+    
+    func dealWithAnimation(_ animation: Animation? = nil, dealingFunction: () -> [SetLikeGame.Card]) {
+        withAnimation(animation ?? cardDealAnimation) {
+            let newCards = dealingFunction()
+            for card in newCards {
+                withAnimation(cardTurnOverAnimation
+                       .delay(cardTurnOverSequenceDelay * Double((newCards.firstIndex(matching: card) ?? 0))))
+                {
+                    sg.makeFaceUp(card)
+                }
+            }
+        }
+    }
+    
+    // MARK: - Animation parameters
+    
+    let cardSelectAnimation: Animation      = .easeInOut(duration: 0.02)
+    let cardDealAnimation: Animation        = .easeIn(duration: 0.5)
+    let cardDealDelay: Double               = 0.2
+    let cardTurnOverAnimation: Animation    = .easeInOut(duration: 0.5)
+    let cardTurnOverSequenceDelay: Double   = 0.05
+    
+    // MARK: - Drawing constants
+    
+    let cardAspectRatio: CGFloat                = 5 / 7
+    let selectedCardScale: CGFloat              = 1.04
+    let selectedCardShadowRadius: CGFloat       = 10
+    let notSelectedCardShadowRadius: CGFloat    = 1.5
+    let cardShadowOpacity: Double               = 0.6
+    let deckHeight: CGFloat                     = 80
+    
+    let standardPadding: CGFloat                = 25
+    let smallPadding: CGFloat                   = 5
+    
 }
 
-extension InsettableShape {
-    @ViewBuilder
-    func sgFill(_ fill: String) -> some View {
-        
-            ZStack{
-                switch fill {
-                case "stroked":
-                    self.fill().opacity(0)
-                case "striped":
-//                    self.fill().opacity(0.8)
-                    Hatch(14, at: Angle(degrees: 90), lineWidth: 1)
-                        .clipShape(self)
-                case "solid":
-                    self.fill().opacity(0.5)
-                default:
-                    self
-                }
-                self.strokeBorder(lineWidth: 3)
-            }
-//            .clipShape(self)
-        
-    }
-}
+// MARK: -
 
 struct ContentView_Previews: PreviewProvider {
     
     static var previews: some View {
         let game = SetGame()
-        game.select(game.cards[1])
+        _ = game.select(game.cards[1])
         return ContentView(sg: game)
 //            .preferredColorScheme(.dark)
     }

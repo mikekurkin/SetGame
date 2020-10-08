@@ -61,26 +61,29 @@ struct SetLikeGame {
     
     /// Toggles `card`'s `isSelected`, if enough cards for a set is selected, checks
     /// if selected cards actually form a set and sets all cards to not selected.
-    mutating func select(_ card: Card) {
-        clearSelection()
-        if card.wasInSet {
-            return
-        }
-        deck[deck.firstIndex(matching: card)!].isSelected.toggle()
-        if selectedCards.count == featureValuesCount {
-            if doFormSet(selectedCards) {
-                for card in selectedCards {
-                    deck[deck.firstIndex(matching: card)!].wasInSet = true
+    mutating func select(_ card: Card) -> [Card] {
+        let newCards = clearSelection()
+        
+        if !card.wasInSet {
+            deck[deck.firstIndex(matching: card)!].isSelected.toggle()
+            if selectedCards.count == featureValuesCount {
+                if doFormSet(selectedCards) {
+                    for card in selectedCards {
+                        deck[deck.firstIndex(matching: card)!].wasInSet = true
+                    }
+                    score += scoreReward
+                } else {
+                    score += scorePenalty
                 }
-                score += scoreReward
-            } else {
-                score += scorePenalty
             }
         }
+        
+        return newCards
     }
     
     /// Takes care of previously selected cards after set is checked
-    mutating private func clearSelection() {
+    mutating private func clearSelection() -> [Card] {
+        var newCardIDs: [Int] = []
         if selectedCards.count == featureValuesCount {
             for card in onScreenCards {
                 if card.wasInSet,
@@ -88,6 +91,7 @@ struct SetLikeGame {
                     if onScreenCards.count <= initialCardsCount,
                        let replacementID = unusedCards.randomElement()?.id {
                         onScreenCardIDs[cardIndex] = replacementID
+                        newCardIDs.append(replacementID)
                     } else {
                         onScreenCardIDs.remove(at: cardIndex)
                     }
@@ -97,6 +101,7 @@ struct SetLikeGame {
                 deck[index].isSelected = false
             }
         }
+        return onScreenCards.filter { newCardIDs.contains($0.id) }
     }
     
     /// Returns true if for `cards` it is true that either all the features
@@ -148,35 +153,39 @@ struct SetLikeGame {
         return deck
     }
 
-    /// "Deals"
-    mutating func deal(_ count: Int) {
-        onScreenCardIDs = []
-        onScreenCardIDs = deck.shuffled().prefix(upTo: count).map{ $0.id }
+    /// Clears on screen cards and deals `count` cards
+    mutating func deal(_ count: Int) -> [Card] {
+        onScreenCardIDs.removeAll()
+        return add(count)
     }
     
-    mutating func add(_ count: Int) {
-        onScreenCardIDs.append(contentsOf: unusedCards.shuffled().prefix(count).map{ $0.id })
+    /// Adds `count` cards to ones that are currently on screen
+    mutating func add(_ count: Int) -> [Card] {
+        let newCardIDs = unusedCards.shuffled().prefix(count).map{ $0.id }
+        onScreenCardIDs.append(contentsOf: newCardIDs)
+        return onScreenCards.filter { newCardIDs.contains($0.id) }
     }
     
-    mutating func setFaceUp(_ card: Card) {
+    /// Turns card face up
+    mutating func makeFaceUp(_ card: Card) {
         if let cardIndex = deck.firstIndex(matching: card) {
-            print(deck[cardIndex].id, terminator: ": ")
-            print(deck[cardIndex].isFaceUp, terminator: " -> ")
             deck[cardIndex].isFaceUp = true
-            print(deck[cardIndex].isFaceUp)
         }
     }
     
-    init?(features: [CardFeature], cardsCount: Int) {
+    init(features: [CardFeature], cardsCount: Int) {
         let featureValuesCounts = features.map { $0.values.count }
+        let featureValuesCount = featureValuesCounts.min() ?? 0
+        
         if !featureValuesCounts.allEqual() {
-            return nil
+            var features = features
+            features = features.map { CardFeature(Array($0.values.prefix(featureValuesCount))) }
         }
-        self.featureValuesCount = featureValuesCounts.first ?? 0
+        
+        self.featureValuesCount = featureValuesCount
         self.features = features
         self.deck = SetLikeGame.generateDeck(with: features).shuffled()
         self.initialCardsCount = cardsCount
-//        deal(self.initialCardsCount)
     }
     
     

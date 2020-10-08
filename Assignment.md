@@ -34,16 +34,16 @@ For each of the attributes cards should be either all the same, or all different
 ### Requirements:
 
 - [x] game works according to the rules
-- [ ] cards get dealed with animation
+- [x] cards get dealed with animation
 - [x] cards shrink and grow depending on number of them on screen
 - [x] cards have same and constant aspect ratio
 - [x] size of symbols is proportional to size of card
 - [x] it is clearly visible if card is selected
 - [x] it is indicated whether three cards are a set or not
 - [x] cards can be deselected
-- [ ] when card is touched with a set selected
+- [x] when card is touched with a set selected
   - [x] cards are replaced with new ones from deck
-  - [ ] matched cards fly away with animation
+  - [x] matched cards fly away with animation
   - [x] replacement cards fly in with animation
   - [x] if deck is empty free space is used for remaining cards
   - [x] if touched card is not part of set it is selected

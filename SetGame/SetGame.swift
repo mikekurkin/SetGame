@@ -19,9 +19,7 @@ class SetGame: ObservableObject {
         let hues = SetLikeGame.CardFeature(Hue.allCases)
         let shadings = SetLikeGame.CardFeature(Shading.allCases)
         
-        guard let game = SetLikeGame(features: [forms, hues, shadings, ranks], cardsCount: 12) else {
-            fatalError()
-        }
+        let game = SetLikeGame(features: [forms, hues, shadings, ranks], cardsCount: 12)
         
         return game
     }
@@ -60,31 +58,31 @@ class SetGame: ObservableObject {
     }
     
     
-    func select(_ card: SetLikeGame.Card) {
+    func select(_ card: SetLikeGame.Card) -> [SetLikeGame.Card] {
         game.select(card)
     }
     
-    func newGame() {
+    func newGame() -> [SetLikeGame.Card] {
         game = SetGame.createSetGame()
-        deal()
+        return deal()
     }
     
-    func deal() {
-        game.deal(initialCardsCount)
+    func deal() -> [SetLikeGame.Card] {
+        return game.deal(initialCardsCount)
     }
     
-    func addThree() {
-        game.add(3)
+    func addThree() -> [SetLikeGame.Card] {
+        return game.add(3)
     }
     
     func turnOverOnScreenCards() {
         for card in cards {
-            game.setFaceUp(card)
+            game.makeFaceUp(card)
         }
     }
     
-    func turnOver(_ card: SetLikeGame.Card) {
-        game.setFaceUp(card)
+    func makeFaceUp(_ card: SetLikeGame.Card) {
+        game.makeFaceUp(card)
     }
     
     func rank(for card: SetLikeGame.Card) -> Int {
@@ -110,11 +108,22 @@ class SetGame: ObservableObject {
         return hue
     }
     
-    func fill(for card: SetLikeGame.Card) -> String {
-        guard let fill = card.features["shading"]?.description else {
-            return ""
+//    func shading(for card: SetLikeGame.Card) -> Shading {
+//        if let shadingString = card.features["shading"]?.description,
+//           let shadingEnum = Shading(rawValue: shadingString) {
+//            return shadingEnum
+//        } else {
+//            return Shading.solid
+//        }
+//    }
+    
+    @ViewBuilder
+    func shaded(_ form: AnyInsettableShape, for card: SetLikeGame.Card) -> some View {
+        if let shading = card.features["shading"] as? Shading {
+            shading.shaded(form)
+        } else {
+            form
         }
-        return fill
     }
 }
 
@@ -148,8 +157,8 @@ enum Form: String, CaseIterable, FeatureValue {
     var value: Any? {
         switch self {
         case .oval: return AnyInsettableShape(Capsule())
-            case .diamond: return AnyInsettableShape(Diamond())
-            case .squiggle: return AnyInsettableShape(Squiggle())
+        case .diamond: return AnyInsettableShape(Diamond())
+        case .squiggle: return AnyInsettableShape(Squiggle())
         }
     }
 }
@@ -180,6 +189,25 @@ enum Shading: String, CaseIterable, FeatureValue {
     var featureName: String { "shading" }
     var description: String { self.rawValue }
     
-    var value: Any? { nil }
+    @ViewBuilder
+    func shaded(_ shape: AnyInsettableShape) -> some View {
+        
+        ZStack{
+            switch self {
+            case .stroked:
+                shape.fill().opacity(0)
+            case .striped:
+                Hatch(14, at: Angle(degrees: 90), lineWidth: 1)
+                    .clipShape(shape)
+            case .solid:
+                shape.fill().opacity(0.5)
+            }
+            shape.strokeBorder(lineWidth: 3)
+        }
+    }
+    
+    var value: Any? {
+        return self.shaded
+    }
 }
 
