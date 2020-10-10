@@ -8,7 +8,7 @@
 import Foundation
 
 extension ArraySlice where Element: Equatable {
-    func allEqual() -> Bool {
+    var allEqual: Bool {
         if self.isEmpty {
             return true
         }
@@ -20,7 +20,7 @@ extension ArraySlice where Element: Equatable {
         return true
     }
     
-    func allDifferent() -> Bool {
+    var allDifferent: Bool {
         if self.isEmpty {
             return false
         }
@@ -32,16 +32,16 @@ extension ArraySlice where Element: Equatable {
         if self.dropFirst().count == 1 {
             return true
         }
-        return self.dropFirst().allDifferent()
+        return self.dropFirst().allDifferent
     }
 }
 
 extension Array where Element: Equatable {
-    func allEqual() -> Bool {
-        return ArraySlice(self).allEqual()
+    var allEqual: Bool {
+        return ArraySlice(self).allEqual
     }
     
-    func allDifferent() -> Bool {
-        return ArraySlice(self).allDifferent()
+    var allDifferent: Bool {
+        return ArraySlice(self).allDifferent
     }
 }

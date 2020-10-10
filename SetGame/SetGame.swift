@@ -57,6 +57,28 @@ class SetGame: ObservableObject {
         game.doFormSet(game.selectedCards)
     }
     
+    var setsCount: Int {
+        game.setsOnScreen.count
+    }
+    
+    var cheatEnabled: Bool {
+        game.cheatEnabled
+    }
+    
+    func enableCheat() {
+        game.enableCheat()
+    }
+    
+    func cheat() {
+        if game.setsOnScreen.isEmpty {
+            return
+        }
+        
+        let set = game.setsOnScreen.randomElement()!
+        for card in set {
+            _ = select(card)
+        }
+    }
     
     func select(_ card: SetLikeGame.Card) -> [SetLikeGame.Card] {
         game.select(card)
@@ -86,7 +108,7 @@ class SetGame: ObservableObject {
     }
     
     func rank(for card: SetLikeGame.Card) -> Int {
-        guard let rank = card.features["rank"]?.value as? Int else {
+        guard let rank = card.featureValues["rank"]?.value as? Int else {
             return 0
         }
         return rank
@@ -94,7 +116,7 @@ class SetGame: ObservableObject {
     
     
     func form(for card: SetLikeGame.Card) -> AnyInsettableShape {
-        if let shape = card.features["form"]?.value as? AnyInsettableShape {
+        if let shape = card.featureValues["form"]?.value as? AnyInsettableShape {
             return shape
         } else {
             return AnyInsettableShape(Rectangle())
@@ -102,7 +124,7 @@ class SetGame: ObservableObject {
     }
     
     func hue(for card: SetLikeGame.Card) -> Color {
-        guard let hue = card.features["hue"]?.value as? Color else {
+        guard let hue = card.featureValues["hue"]?.value as? Color else {
             return Color.black
         }
         return hue
@@ -119,7 +141,7 @@ class SetGame: ObservableObject {
     
     @ViewBuilder
     func shaded(_ form: AnyInsettableShape, for card: SetLikeGame.Card) -> some View {
-        if let shading = card.features["shading"] as? Shading {
+        if let shading = card.featureValues["shading"] as? Shading {
             shading.shaded(form)
         } else {
             form

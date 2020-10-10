@@ -20,19 +20,36 @@ struct ContentView: View {
                 Spacer()
                 
                 HStack(alignment: .top, spacing: standardPadding) {
-                    HStack(spacing: standardPadding) {
-                        Text(String(sg.score)).bold()
+                    VStack(alignment: .trailing, spacing: smallPadding) {
+                        HStack(spacing: standardPadding) {
+                            
+                            
+                            Text(String(sg.score)).bold()
+                            
+                            Button {
+                                dealWithAnimation { sg.addThree() }
+                            } label: { Image(systemName: "plus") }
+                                .disabled(sg.unusedCardsCount == 0)
+                            
+                            Button {
+                                dealWithAnimation { sg.newGame() }
+                            } label: { Image(systemName: "shuffle") }
+                            
+                        }
                         
-                        Button {
-                            dealWithAnimation { sg.addThree() }
-                        } label: { Image(systemName: "plus") }
-                            .disabled(sg.unusedCardsCount == 0)
-                        
-                        Button {
-                            dealWithAnimation { sg.newGame() }
-                        } label: { Image(systemName: "shuffle") }
-                        
+                        if sg.cheatEnabled {
+                            HStack(spacing: standardPadding) {
+                                Text(String(sg.setsCount)).bold()
+                                
+                                Button {
+                                    withAnimation { sg.cheat() }
+                                } label: { Image(systemName: "questionmark.diamond") }
+                                    .disabled(sg.setsCount == 0)
+                            }
+                        }
                     }
+                        
+                    
                     ZStack {
                         GeometryReader { geometry in
                             EmptyView()
@@ -55,6 +72,9 @@ struct ContentView: View {
                             .foregroundColor(.white)
                     }
                     .foregroundColor(.purple)
+                    .onTapGesture(count: 8) {
+                        sg.enableCheat()
+                    }
                     
                 }
             }

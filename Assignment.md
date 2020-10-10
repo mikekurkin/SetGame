@@ -78,6 +78,6 @@ For each of the attributes cards should be either all the same, or all different
 - [x] score is implemented
 - [ ] bonus score for quicker match
 - [ ] penalty is implemented for using an add button when set is available
-- [ ] cheat button is implemented
+- [x] cheat button is implemented
 - [ ] two player mode is supported
 

@@ -21,6 +21,13 @@ struct SetLikeGame {
     private let scoreReward =  +1
     private let scorePenalty = -1
     
+    
+    private(set) var cheatEnabled: Bool = false
+    
+    mutating func enableCheat() {
+        cheatEnabled = true
+    }
+    
     /// Contains ordered `id`s of cards currently on screen
     private(set) var onScreenCardIDs: [Int] = [] {
         didSet {
@@ -32,6 +39,12 @@ struct SetLikeGame {
                     }
                 }
             }
+        }
+    }
+    
+    var setsOnScreen: [[Card]] {
+        onScreenCards.combinations(ofLength: featureValuesCount).filter {
+            doFormSet($0)
         }
     }
     
@@ -111,28 +124,28 @@ struct SetLikeGame {
             return false
         }
         
-        print(cards.map{$0.description})
+//        print(cards.map{$0.description})
         
         var cardFeatures: [[String]] = []
         for (featureIndex, feature) in features.enumerated() {
             cardFeatures.append([])
             for card in cards {
-                cardFeatures[featureIndex].append(card.features[feature.featureName]?.rawValue ?? "")
+                cardFeatures[featureIndex].append(card.featureValues[feature.featureName]?.rawValue ?? "")
             }
-            print(feature.featureName, cardFeatures[featureIndex])
+//            print(feature.featureName, cardFeatures[featureIndex])
         }
         
-        let sameOrDifferent = cardFeatures.map{ $0.allEqual() || $0.allDifferent() }
-        print(sameOrDifferent)
+        let sameOrDifferent = cardFeatures.map{ $0.allEqual || $0.allDifferent }
+//        print(sameOrDifferent)
         
         let isSet = sameOrDifferent.reduce(true) { $0 && $1 }
-        print(isSet)
+//        print(isSet)
         
         return isSet
     }
     
     /// Returns a deck containing all cards with unique combinations of features.
-    private static func generateDeck(with features: [CardFeature], deck: [Card] = [], card: Card = Card(id: 0, features: [:])) -> [Card] {
+    private static func generateDeck(with features: [CardFeature], deck: [Card] = [], card: Card = Card(id: 0, featureValues: [:])) -> [Card] {
             
         var features = features
         var deck = deck
@@ -140,7 +153,7 @@ struct SetLikeGame {
         
         if !features.isEmpty {
             for value in features.removeLast().values {
-                card.features.updateValue(value, forKey: value.featureName)
+                card.featureValues.updateValue(value, forKey: value.featureName)
                 if features.isEmpty {
                     card.id = deck.count
                     deck.append(card)
@@ -177,7 +190,7 @@ struct SetLikeGame {
         let featureValuesCounts = features.map { $0.values.count }
         let featureValuesCount = featureValuesCounts.min() ?? 0
         
-        if !featureValuesCounts.allEqual() {
+        if !featureValuesCounts.allEqual {
             var features = features
             features = features.map { CardFeature(Array($0.values.prefix(featureValuesCount))) }
         }
@@ -189,9 +202,10 @@ struct SetLikeGame {
     }
     
     
-    struct Card: Identifiable {
+    struct Card: Identifiable, Equatable {
+        
         var id: Int
-        var features: [String:FeatureValue]
+        var featureValues: [String : FeatureValue]
         
         var isOnScreen: Bool = false
         var isFaceUp: Bool = false
@@ -200,15 +214,29 @@ struct SetLikeGame {
         var wasInSet: Bool = false
         
         var description: String {
+            let sortedFeatureValues = featureValues.sorted(by: { $0.key < $1.key })
+            
             var res = "\(id):"
-            for feature in features {
+            
+            for feature in sortedFeatureValues {
                 res += " \(feature.value.description)"
             }
             return res
         }
+        
+        static func == (lhs: SetLikeGame.Card, rhs: SetLikeGame.Card) -> Bool {
+            if !(Set(lhs.featureValues.keys) == Set(rhs.featureValues.keys)) {
+                return false
+            }
+            
+            let keys = lhs.featureValues.keys
+            
+            return keys.compactMap { lhs.featureValues[$0]?.rawValue } == keys.compactMap { rhs.featureValues[$0]?.rawValue }
+        }
     }
     
     struct CardFeature {
+        
         let values: [FeatureValue]
         var featureName: String
         
