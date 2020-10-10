@@ -10,7 +10,7 @@ import Foundation
 struct SetLikeGame {
     
     private var features: [CardFeature]
-    private(set) var featureValuesCount: Int
+    private(set) var cardsInSetCount: Int
     
     private(set) var deck: [Card]
     
@@ -20,13 +20,9 @@ struct SetLikeGame {
     
     private let scoreReward =  +1
     private let scorePenalty = -1
+    private let unnoticedSetPenalty = -2
     
     
-    private(set) var cheatEnabled: Bool = false
-    
-    mutating func enableCheat() {
-        cheatEnabled = true
-    }
     
     /// Contains ordered `id`s of cards currently on screen
     private(set) var onScreenCardIDs: [Int] = [] {
@@ -43,7 +39,7 @@ struct SetLikeGame {
     }
     
     var setsOnScreen: [[Card]] {
-        onScreenCards.combinations(ofLength: featureValuesCount).filter {
+        onScreenCards.combinations(ofLength: cardsInSetCount).filter {
             doFormSet($0)
         }
     }
@@ -79,7 +75,7 @@ struct SetLikeGame {
         
         if !card.wasInSet {
             deck[deck.firstIndex(matching: card)!].isSelected.toggle()
-            if selectedCards.count == featureValuesCount {
+            if selectedCards.count == cardsInSetCount {
                 if doFormSet(selectedCards) {
                     for card in selectedCards {
                         deck[deck.firstIndex(matching: card)!].wasInSet = true
@@ -97,7 +93,7 @@ struct SetLikeGame {
     /// Takes care of previously selected cards after set is checked
     mutating private func clearSelection() -> [Card] {
         var newCardIDs: [Int] = []
-        if selectedCards.count == featureValuesCount {
+        if selectedCards.count == cardsInSetCount {
             for card in onScreenCards {
                 if card.wasInSet,
                    let cardIndex = onScreenCardIDs.firstIndex(of: card.id) {
@@ -120,11 +116,9 @@ struct SetLikeGame {
     /// Returns true if for `cards` it is true that either all the features
     /// are the same or they are all different.
     func doFormSet(_ cards: [Card]) -> Bool {
-        if cards.count != featureValuesCount {
+        if cards.count != cardsInSetCount {
             return false
         }
-        
-//        print(cards.map{$0.description})
         
         var cardFeatures: [[String]] = []
         for (featureIndex, feature) in features.enumerated() {
@@ -132,14 +126,11 @@ struct SetLikeGame {
             for card in cards {
                 cardFeatures[featureIndex].append(card.featureValues[feature.featureName]?.rawValue ?? "")
             }
-//            print(feature.featureName, cardFeatures[featureIndex])
         }
         
         let sameOrDifferent = cardFeatures.map{ $0.allEqual || $0.allDifferent }
-//        print(sameOrDifferent)
         
         let isSet = sameOrDifferent.reduce(true) { $0 && $1 }
-//        print(isSet)
         
         return isSet
     }
@@ -173,10 +164,20 @@ struct SetLikeGame {
     }
     
     /// Adds `count` cards to ones that are currently on screen
-    mutating func add(_ count: Int) -> [Card] {
-        let newCardIDs = unusedCards.shuffled().prefix(count).map{ $0.id }
-        onScreenCardIDs.append(contentsOf: newCardIDs)
-        return onScreenCards.filter { newCardIDs.contains($0.id) }
+    mutating func add(_ count: Int? = nil) -> [Card] {
+        
+        if setsOnScreen.count > 0 {
+            score += unnoticedSetPenalty
+        }
+        
+        let newCards = clearSelection()
+        if !newCards.isEmpty {
+            return newCards
+        } else {
+            let newCardIDs = unusedCards.shuffled().prefix(count ?? cardsInSetCount).map{ $0.id }
+            onScreenCardIDs.append(contentsOf: newCardIDs)
+            return onScreenCards.filter { newCardIDs.contains($0.id) }
+        }
     }
     
     /// Turns card face up
@@ -184,6 +185,12 @@ struct SetLikeGame {
         if let cardIndex = deck.firstIndex(matching: card) {
             deck[cardIndex].isFaceUp = true
         }
+    }
+    
+    private(set) var cheatEnabled: Bool = false
+    
+    mutating func enableCheat() {
+        cheatEnabled = true
     }
     
     init(features: [CardFeature], cardsCount: Int) {
@@ -195,7 +202,7 @@ struct SetLikeGame {
             features = features.map { CardFeature(Array($0.values.prefix(featureValuesCount))) }
         }
         
-        self.featureValuesCount = featureValuesCount
+        self.cardsInSetCount = featureValuesCount
         self.features = features
         self.deck = SetLikeGame.generateDeck(with: features).shuffled()
         self.initialCardsCount = cardsCount

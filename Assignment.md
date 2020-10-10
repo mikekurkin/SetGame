@@ -50,8 +50,8 @@ For each of the attributes cards should be either all the same, or all different
 - [x] when card is touched with a non-set selected
   - [x] set gets deselected
   - [x] touched card gets selected
-- [ ] there is add three cards button
-  - [ ] when it is touched selected cards get replaced if they are set
+- [x] there is add three cards button
+  - [x] when it is touched selected cards get replaced if they are set
   - [x] if there is no set selected three cards get added
   - [x] button is deactivated when the deck is empty
 - [x] there is a new game button
@@ -77,7 +77,7 @@ For each of the attributes cards should be either all the same, or all different
 - [ ] cards fly away with exciting animation
 - [x] score is implemented
 - [ ] bonus score for quicker match
-- [ ] penalty is implemented for using an add button when set is available
+- [x] penalty is implemented for using an add button when set is available
 - [x] cheat button is implemented
 - [ ] two player mode is supported
 

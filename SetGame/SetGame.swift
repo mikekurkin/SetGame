@@ -30,7 +30,7 @@ class SetGame: ObservableObject {
 //    }
     
     var cardsInSetCount: Int {
-        game.featureValuesCount
+        game.cardsInSetCount
     }
     
     var initialCardsCount: Int {
@@ -94,7 +94,7 @@ class SetGame: ObservableObject {
     }
     
     func addThree() -> [SetLikeGame.Card] {
-        return game.add(3)
+        return game.add()
     }
     
     func turnOverOnScreenCards() {
