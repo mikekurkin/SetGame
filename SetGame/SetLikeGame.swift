@@ -91,7 +91,7 @@ struct SetLikeGame {
     }
     
     /// Takes care of previously selected cards after set is checked
-    mutating private func clearSelection() -> [Card] {
+    mutating func clearSelection() -> [Card] {
         var newCardIDs: [Int] = []
         if selectedCards.count == cardsInSetCount {
             for card in onScreenCards {

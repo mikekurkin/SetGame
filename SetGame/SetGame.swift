@@ -69,15 +69,23 @@ class SetGame: ObservableObject {
         game.enableCheat()
     }
     
-    func cheat() {
+    func cheat() -> [SetLikeGame.Card] {
         if game.setsOnScreen.isEmpty {
-            return
+            return []
+        }
+        
+        if selectedSet {
+            return game.clearSelection()
         }
         
         let set = game.setsOnScreen.randomElement()!
+        for card in game.selectedCards {
+            _ = select(card)
+        }
         for card in set {
             _ = select(card)
         }
+        return []
     }
     
     func select(_ card: SetLikeGame.Card) -> [SetLikeGame.Card] {

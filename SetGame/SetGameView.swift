@@ -42,7 +42,7 @@ struct ContentView: View {
                                 Text(String(sg.setsCount)).bold()
                                 
                                 Button {
-                                    withAnimation { sg.cheat() }
+                                    dealWithAnimation { sg.cheat() }
                                 } label: { Image(systemName: "questionmark.diamond") }
                                     .disabled(sg.setsCount == 0)
                             }
@@ -80,7 +80,7 @@ struct ContentView: View {
             }
             .font(.title)
             .padding(Edge.Set.horizontal.union(.top), standardPadding)
-            .zIndex(1)
+            .zIndex(0.9)
                 
             Grid(sg.cards, itemDesiredAspectRatio: Double(cardAspectRatio)) { card in
                 
@@ -113,6 +113,7 @@ struct ContentView: View {
                 .shadow(color: (card.isSelected && sg.selectedCardsCount == sg.cardsInSetCount) ?
                             (sg.selectedSet ? Color.green : Color.red) : Color.primary.opacity(cardShadowOpacity),
                         radius: (card.isSelected ? selectedCardShadowRadius : notSelectedCardShadowRadius))
+                .zIndex(card.isSelected ? 1.0 : 0.0)
                 .padding(smallPadding)
                 .onTapGesture {
                     dealWithAnimation(cardSelectAnimation) { sg.select(card) }
@@ -160,7 +161,7 @@ struct ContentView: View {
     let deckHeight: CGFloat                     = 80
     
     let standardPadding: CGFloat                = 25
-    let smallPadding: CGFloat                   = 5
+    let smallPadding: CGFloat                   = 7
     
 }
 
